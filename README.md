@@ -1,13 +1,13 @@
 <p align="center">
   <h2>
-	TAPTAP-ADMIN
+	TAPTAP-API
   </h2>
 </p>
 
 
 ## 简介
 
- - [taptap-admin](https://github.com/lee-fx/taptap-admin) 是一个后端接口解决方案，它基于 [golang](https://github.com/golang/go) 实现。
+ - [taptap-api](https://github.com/lee-fx/taptap-api) 是一个后端接口解决方案，它基于 [golang](https://github.com/golang/go) 实现。
  - 主要功能是为uniapp的前端，vue的后台管理系统，实现全部接口。
 
 
@@ -37,7 +37,7 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/lee-fx/taptap-admin.git
+git clone https://github.com/lee-fx/taptap-api.git
 ```
 
 
