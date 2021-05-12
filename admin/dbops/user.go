@@ -1,10 +1,30 @@
 package dbops
 
 import (
+	"api/admin/defs"
+	"api/admin/utils"
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
+
+func VerifyUserLogin(info *defs.UserLogin) (bool, error) {
+	username := info.UserName
+	password := utils.GetMD5HashCode([]byte(info.UserName))
+	stmtOut, err := dbConn.Prepare("SELECT count(*) FROM admin_user WHERE username = ? AND password = ?")
+	if err != nil {
+		log.Printf("verify user error: %s", err)
+		return false, err
+	}
+	var id string
+	err = stmtOut.QueryRow(username, password).Scan(&id)
+	if err != nil && err != sql.ErrNoRows {
+		return true, nil
+	}
+	stmtOut.Close()
+	return false, nil
+
+}
 
 func AddUserCredential(loginName string, pwd string) error {
 	stmtIns, err := dbConn.Prepare("INSERT INTO users (login_name, pwd) VALUES(?, ?)")
@@ -19,7 +39,7 @@ func AddUserCredential(loginName string, pwd string) error {
 	return nil
 }
 
-func GetUserCredential(loginName string) (string, error){
+func GetUserCredential(loginName string) (string, error) {
 	stmtOut, err := dbConn.Prepare("SELECT pwd FROM users WHERE login_name = ?")
 	if err != nil {
 		log.Printf("get user error: %s", err)
@@ -43,6 +63,3 @@ func DeleteUser(loginName string, pwd string) error {
 	defer stmtDel.Close()
 	return nil
 }
-
-
-

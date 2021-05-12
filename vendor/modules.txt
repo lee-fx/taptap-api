@@ -1,5 +1,8 @@
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
+# github.com/dgrijalva/jwt-go v0.0.0-20180308231308-06ea1031745c
+## explicit
+github.com/dgrijalva/jwt-go
 # github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f
 github.com/dgryski/go-rendezvous
 # github.com/go-redis/redis/v8 v8.8.2
