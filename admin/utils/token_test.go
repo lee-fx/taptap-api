@@ -24,7 +24,7 @@ func cToken(t *testing.T) {
 		ShowTime:   "污了",
 		CreateTime: "污了",
 	}
-	token, err := GenerateToken(user)
+	token, err := GenerateToken(&user)
 	if err != nil {
 		fmt.Printf("get token err : %v", err)
 	}

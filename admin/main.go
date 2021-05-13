@@ -1,7 +1,10 @@
 package main
 
 import (
+	"api/admin/defs"
+	"api/admin/utils"
 	"github.com/julienschmidt/httprouter"
+	"github.com/wxnacy/wgo/arrays"
 	"log"
 	"net/http"
 )
@@ -23,8 +26,20 @@ func (m middleWareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Headers", "Content-Type, Authorization") //header的类型
 	w.Header().Set("content-type", "application/json")                            //返回数据格式是json
 
-	//check session
-	//ValidateUserSession(r)
+	var urlList []string
+	urlList = append(urlList, "/admin/info")
+	urlList = append(urlList, "/admin/logout")
+
+	if arrays.ContainsString(urlList, r.RequestURI) > -1 {
+		//check jwt-token
+		if utils.ValidateJwtToken(r) {
+			utils.SendErrorResponse(w, defs.ErrorJwtTokenValidateFaild)
+			return
+		}
+
+	}
+
+	//check jwt-token
 
 	m.r.ServeHTTP(w, r)
 }

@@ -1,8 +1,9 @@
 package defs
 
 type Err struct {
-	Error     string `json:"error"`
-	ErrorCode string `json:"error_code"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
 }
 
 type ErroResponse struct {
@@ -11,18 +12,16 @@ type ErroResponse struct {
 }
 
 var (
-	// internal
+	// 请求错误
+	ErrorRequestBodyParseFailed = ErroResponse{HttpSc: 200, Error: Err{Message: "请求参数错误.", Code: 100001, Data: nil}}
 
-	// 请求参数错误
-	ErrorRequestBodyParseFailed = ErroResponse{HttpSc: 400, Error: Err{Error: "Request body is not correct.", ErrorCode: "1001"}}
-	// 登录用户验证失败
-	ErrorNotAuthUser            = ErroResponse{HttpSc: 401, Error: Err{Error: "User authentication failed.", ErrorCode: "1002"}}
+	// 校验错误
+	ErrorNotAuthUser = ErroResponse{HttpSc: 200, Error: Err{Message: "用户登录校验失败.", Code: 200001, Data: nil}}
+	ErrorJwtTokenValidateFaild = ErroResponse{HttpSc: 200, Error: Err{Message: "用户token校验失败.", Code: 200002, Data: nil}}
 
-	// server
+	// 数据错误
+	ErrorDBError = ErroResponse{HttpSc: 200, Error: Err{Message: "DB ops failed.", Code: 300001, Data: nil}}
 
-	// 数据库错误
-	ErrorDBError        = ErroResponse{HttpSc: 500, Error: Err{Error: "DB ops failed.", ErrorCode: "1003"}}
-
-	// 服务器内部故障
-	ErrorInternalFaults = ErroResponse{HttpSc: 500, Error: Err{Error: "Internal service error.", ErrorCode: "1004"}}
+	// 内部错误
+	ErrorInternalFaults = ErroResponse{HttpSc: 200, Error: Err{Message: "Internal service error.", Code: 400001, Data: nil}}
 )

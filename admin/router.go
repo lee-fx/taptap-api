@@ -15,7 +15,7 @@ func RegisterHandlers() *httprouter.Router {
 	// user info
 	router.GET("/admin/info", controllers.AdminUserInfo)
 
-	// user logout
+	// user logout verify user error:
 	router.POST("/admin/logout", controllers.AdminUserLogout)
 
 	//router.POST("/user", controllers.CreateUser)

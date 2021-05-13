@@ -34,7 +34,7 @@ func init() {
 	}
 }
 
-func GetLbMysqlName() string {
+func GetMysqlName() string {
 	return configuration.MYSQL_NAME
 }
 

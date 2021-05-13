@@ -12,7 +12,7 @@ type Configuration struct {
 	MYSQL_HOST string `json:"mysql_host"`
 	MYSQL_PORT string `json:"mysql_port"`
 	MYSQL_APP_DB string `json:"mysql_app_db"`
-	MYSQL_ADMIN_DB string `json:"msyql_admin_db"`
+	MYSQL_ADMIN_DB string `json:"mysql_admin_db"`
 
 	REDIS_ADDR string `json:"redis_addr"`
 	REDIS_PORT string `json:"redis_port"`
@@ -34,7 +34,7 @@ func init() {
 	}
 }
 
-func GetLbMysqlName() string {
+func GetMysqlName() string {
 	return configuration.MYSQL_NAME
 }
 

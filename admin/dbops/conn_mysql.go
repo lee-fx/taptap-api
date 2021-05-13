@@ -12,7 +12,7 @@ var (
 )
 
 func init() {
-	mysql_name := config.GetLbMysqlName()
+	mysql_name := config.GetMysqlName()
 	mysql_password := config.GetMysqlPassword()
 	mysql_host := config.GetMysqlHost()
 	mysql_port := config.GetMysqlPort()
