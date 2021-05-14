@@ -38,13 +38,8 @@ func (m middleWareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 	}
-
-	//check jwt-token
-
 	m.r.ServeHTTP(w, r)
 }
-
-// listen -> RegisterHandelers -> handlers
 
 func main() {
 	r := RegisterHandlers()

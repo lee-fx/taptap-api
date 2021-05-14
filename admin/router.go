@@ -15,11 +15,18 @@ func RegisterHandlers() *httprouter.Router {
 	// user info
 	router.GET("/admin/info", controllers.AdminUserInfo)
 
-	// user logout verify user error:
+	// user logout
 	router.POST("/admin/logout", controllers.AdminUserLogout)
 
-	//router.POST("/user", controllers.CreateUser)
-	//router.POST("/user/:user_name", controllers.UserLogin)
+	// user curd
+	router.GET("/admin/list", controllers.AdminUserList)
+
+	// role curd
+	router.GET("/role/listAll", controllers.AdminRoleList)
+
+	// menu curd
+
+	// resource curd
 
 	return router
 }

@@ -25,19 +25,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		utils.SendErrorResponse(w, defs.ErrorDBError)
 		return
 	}
-
-	//id := session.GenerateNewSesssionId(ubody.Username)
-	//su := &defs.SignedUp{
-	//	Success:   true,
-	//	SessionId: id,
-	//}
-	//
-	//if resp, err := json.Marshal(su); err != nil {
-	//	utils.SendErrorResponse(w, defs.ErrorInternalFaults)
-	//	return
-	//} else {
-	//	utils.SendNormalResponse(w, string(resp), 201)
-	//}
 }
 
 func UserLogin(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -93,8 +80,8 @@ func AdminUserInfo(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 	// 通过用户id组装用户操作menu信息
 	//fmt.Println(uid)
-	res, err := dbops.GetUserInfo(uid);
-	if  err != nil {
+	res, err := dbops.GetUserInfo(uid)
+	if err != nil {
 		log.Printf("error: %v ", err)
 		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
 		return

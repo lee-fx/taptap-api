@@ -17,6 +17,7 @@ var (
 
 	// 校验错误
 	ErrorNotAuthUser = ErroResponse{HttpSc: 200, Error: Err{Message: "用户登录校验失败.", Code: 200001, Data: nil}}
+
 	ErrorJwtTokenValidateFaild = ErroResponse{HttpSc: 200, Error: Err{Message: "用户token校验失败.", Code: 200002, Data: nil}}
 
 	// 数据错误
