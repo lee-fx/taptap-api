@@ -16,7 +16,6 @@ func VerifyUserLogin(info *defs.UserLogin) (*defs.User, error) {
 	stmtOut, err := dbConn.Prepare("SELECT id, iphone FROM admin_user WHERE username = ? AND password = ? AND del_flag = 0")
 	if err != nil{
 		log.Printf("verify user sql error: %s", err)
-
 		return nil, err
 	}
 	err = stmtOut.QueryRow(username, password).Scan(&userInfo.Id, &userInfo.Iphone)
@@ -72,69 +71,68 @@ func DeleteUser(loginName string, pwd string) error {
 	return nil
 }
 
-func GetUserInfo() ([]defs.GameList, error) {
-	start := (page - 1) * to
-	var game []defs.GameList
-	var orderBy string
-	switch Type {
-	case 0:
-		orderBy = ""
-	case 1:
-		orderBy = "ORDER BY id"
-	case 2:
-		orderBy = "ORDER BY attention desc"
-	case 3:
-		orderBy = "ORDER BY mana desc"
-	case 4:
-		orderBy = "ORDER BY create_time desc"
-	default:
-		orderBy = "ORDER BY id desc"
+// 获取用户权限信息
+func GetUserInfo(uid int64) (*defs.UserInfo, error) {
+
+	// 根据uid获取用户信息
+	user := &defs.User{}
+	userInfo := &defs.UserInfo{}
+	stmtUser, err := dbConn.Prepare("SELECT icon,username FROM admin_user WHERE del_flag = 0 AND id = ?")
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get user info err: %s", err)
+
+		return userInfo, err
 	}
+	err = stmtUser.QueryRow(uid).Scan(&user.Icon, &user.Name)
+	defer stmtUser.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("select user info err: %s", err)
 
-	stmtOut, err := dbConn.Prepare("SELECT id, icon,name, mana FROM game WHERE del_flag = 0 " + orderBy + " LIMIT ?,?")
+		return userInfo, err
+	}
+	userInfo.Icon = user.Icon
+	//fmt.Printf("%v", userInfo.Icon)
 
+
+	stmtRoles, err := dbConn.Prepare("SELECT ROLE.id,ROLE.name FROM admin_role_relation AS R RIGHT JOIN admin_role AS ROLE ON R.role_id = ROLE.id WHERE R.admin_id = ?")
 	if err != nil {
-		log.Printf("get Games error: %s", err)
-		return game, err
+		log.Printf("get user roles error: %s", err)
+		return userInfo, err
 	}
 
-	rows, err := stmtOut.Query(start, to)
-	if err != nil {
-		return game, err
-	}
-	for rows.Next() {
-		line := defs.GameList{}
-		err = rows.Scan(&line.Id, &line.Icon, &line.Name, &line.Mana)
+	RoleRows, err := stmtRoles.Query(uid)
+	for RoleRows.Next() {
+		var id int
+		var name string
+		err = RoleRows.Scan(&id, &name)
 		if err != nil {
-			return game, err
+			log.Printf("roles sql scan error: %s", err)
+			return userInfo, err
+		}
+		userInfo.Roles = append(userInfo.Roles, name)
+
+		//fmt.Printf("%v", userInfo.Roles)
+
+		stmtMenus, err := dbConn.Prepare("SELECT M.id, M.parent_id, M.create_time, M.title, M.level, M.sort, M.name, M.icon, M.hidden FROM admin_role_menu_relation AS R RIGHT JOIN admin_menu AS M ON R.menu_id = M.id WHERE R.role_id = ?")
+		if err != nil {
+			log.Printf("get user menus error: %s", err)
+			return userInfo, err
 		}
 
-		// 组装game_tag
-		var gameTag []defs.GameTag
-
-		stmtOutTag, err := dbConn.Prepare("SELECT tag_name FROM game_tag WHERE game_id=? limit 3")
-		if err != nil {
-			log.Printf("get game tag error: %s", err)
-			return game, err
-		}
-
-		tagRows, err := stmtOutTag.Query(&line.Id)
-		for tagRows.Next() {
-			tagLine := defs.GameTag{}
-			err = tagRows.Scan(&tagLine.TagName)
+		menuRows, err := stmtMenus.Query(&id)
+		for menuRows.Next() {
+			menu := defs.Menu{}
+			err = menuRows.Scan(&menu.Id, &menu.ParentId, &menu.CreateTime, &menu.Title, &menu.Level, &menu.Sort, &menu.Name, &menu.Icon, &menu.Hidden)
 			if err != nil {
-				log.Printf("sql scan error: %s", err)
-				return game, err
+				log.Printf("menus sql scan error: %s", err)
+				return userInfo, err
 			}
-			gameTag = append(gameTag, tagLine)
+			userInfo.Menus = append(userInfo.Menus, menu)
 		}
-		line.GameTag = gameTag
 		//gameTag = []defs.GameTag{}
 
-		game = append(game, line)
-
 	}
-	defer stmtOut.Close()
 
-	return game, nil
+	return userInfo, nil
+
 }

@@ -5,7 +5,7 @@ type User struct {
 	Id int64 `json:"id"`
 	Name string `json:"name"`
 	PassWord string `json:"passWord"`
-	Avatar string `json:"avatar"`
+	Icon string `json:"icon"`
 	Iphone string `json:"iphone"`
 	ShowTime string `json:"showTime"`
 	CreateTime string `json:"createTime"`
@@ -22,9 +22,10 @@ type UserLogin struct {
 //
 
 // response
-type SignedUp struct {
-	Success   bool   `json:"success"`
-	SessionId string `json:"session_id"`
+type NormalResponse struct {
+	Code    int `json:"code"`
+	Message string `json:"message"`
+	Data interface{} `json:"data"`
 }
 
 // session
