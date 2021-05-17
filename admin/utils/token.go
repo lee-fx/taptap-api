@@ -9,7 +9,7 @@ import (
 type Claims struct {
 	Id       int64  `json:"id"`
 	UserName string `json:"userName"`
-	Iphone   string `json:"iphone"`
+	Email   string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -20,8 +20,8 @@ func GenerateToken(user *defs.User) (string, error) {
 	issuer := "lee-fx"
 	claims := Claims{
 		Id:       user.Id,
-		UserName: user.Name,
-		Iphone:   user.Iphone,
+		UserName: user.UserName,
+		Email:   user.Email,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expireTime.Unix(),
 			Issuer:    issuer,

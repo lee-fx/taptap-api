@@ -4,6 +4,7 @@ import (
 	"api/admin/defs"
 	"api/admin/utils"
 	"database/sql"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
@@ -13,12 +14,12 @@ func VerifyUserLogin(info *defs.UserLogin) (*defs.User, error) {
 	password := utils.GetMD5HashCode([]byte(info.UserName))
 	//fmt.Println(password)
 	userInfo := &defs.User{}
-	stmtOut, err := dbConn.Prepare("SELECT id, iphone FROM admin_user WHERE username = ? AND password = ? AND del_flag = 0")
-	if err != nil{
+	stmtOut, err := dbConn.Prepare("SELECT id, email FROM admin_user WHERE username = ? AND password = ? AND del_flag = 0")
+	if err != nil {
 		log.Printf("verify user sql error: %s", err)
 		return nil, err
 	}
-	err = stmtOut.QueryRow(username, password).Scan(&userInfo.Id, &userInfo.Iphone)
+	err = stmtOut.QueryRow(username, password).Scan(&userInfo.Id, &userInfo.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			log.Printf("user not found: %s", err)
@@ -71,6 +72,55 @@ func DeleteUser(loginName string, pwd string) error {
 	return nil
 }
 
+// 获取用户列表
+func AdminUserList(page, to int) (*defs.UserList, error) {
+
+	userList := &defs.UserList{}
+	userList.PageNum = page // 1
+	userList.PageSize = to  // 10
+
+	totalRow, err := dbConn.Query("SELECT COUNT(*) FROM admin_user WHERE del_flag = 0")
+	if err != nil {
+		fmt.Println("get total users sql error", err)
+		return nil, err
+	}
+	total := 0
+	for totalRow.Next() {
+		err := totalRow.Scan(
+			&total,
+		)
+		if err != nil {
+			fmt.Println("get total users error", err)
+			continue
+		}
+	}
+	totalRow.Close()
+
+	// 获取总页数
+	maxpage := utils.GetPageLimit(total, to)
+	userList.Total = total
+	userList.TotalPage = maxpage
+
+	stmtUser, err := dbConn.Prepare("SELECT id, username, password, icon, email, nickname, note, create_time, login_time, status FROM admin_user WHERE del_flag = 0 LIMIT ?,?")
+	defer stmtUser.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get user info err: %s", err)
+		return userList, err
+	}
+	stmtRows, err := stmtUser.Query(page-1, to)
+	for stmtRows.Next() {
+		line := &defs.User{}
+		err = stmtRows.Scan(&line.Id, &line.UserName, &line.PassWord, &line.Icon, &line.Email, &line.NickName, &line.Note, &line.CreateTime, &line.LoginTime, &line.Status)
+		if err != nil {
+			log.Printf("users sql scan error: %s", err)
+			return userList, err
+		}
+		userList.List = append(userList.List, line)
+	}
+
+	return userList, nil
+}
+
 // 获取用户权限信息
 func GetUserInfo(uid int64) (*defs.UserInfo, error) {
 
@@ -83,7 +133,7 @@ func GetUserInfo(uid int64) (*defs.UserInfo, error) {
 
 		return userInfo, err
 	}
-	err = stmtUser.QueryRow(uid).Scan(&user.Icon, &user.Name)
+	err = stmtUser.QueryRow(uid).Scan(&user.Icon, &user.UserName)
 	defer stmtUser.Close()
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("select user info err: %s", err)
@@ -93,8 +143,8 @@ func GetUserInfo(uid int64) (*defs.UserInfo, error) {
 	userInfo.Icon = user.Icon
 	//fmt.Printf("%v", userInfo.Icon)
 
-
 	stmtRoles, err := dbConn.Prepare("SELECT ROLE.id,ROLE.name FROM admin_role_relation AS R RIGHT JOIN admin_role AS ROLE ON R.role_id = ROLE.id WHERE R.admin_id = ?")
+	defer stmtRoles.Close()
 	if err != nil {
 		log.Printf("get user roles error: %s", err)
 		return userInfo, err

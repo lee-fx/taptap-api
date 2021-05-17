@@ -4,12 +4,14 @@ import (
 	"api/admin/dbops"
 	"api/admin/defs"
 	"log"
+	"strconv"
+
+	//"strconv"
 
 	//"api/admin/session"
 	"api/admin/utils"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
-	"io"
 	"io/ioutil"
 	"net/http"
 )
@@ -27,11 +29,32 @@ func CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 }
 
-func UserLogin(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uname := p.ByName("user_name")
-	io.WriteString(w, uname)
+// 查询所有用户
+func AdminUserList(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+
+	//获取请求参数
+	params := r.URL.Query()
+	page, _ := strconv.Atoi(params["pageNum"][0])
+	to, _ := strconv.Atoi(params["pageSize"][0])
+
+	res, err := dbops.AdminUserList(page, to)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "登陆成功",
+		Data:    res,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+
 }
 
+// 用户登录
 func AdminUserLogin(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	// 获取请求参数
 	res, _ := ioutil.ReadAll(r.Body)
@@ -53,7 +76,7 @@ func AdminUserLogin(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	}
 
 	// 生成jwt-token并返回
-	user.Name = ubody.UserName
+	user.UserName = ubody.UserName
 	token, err := utils.GenerateToken(user)
 	if err != nil {
 		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
@@ -72,6 +95,7 @@ func AdminUserLogin(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	utils.SendNormalResponse(w, *resData, 200)
 }
 
+// 用户路由信息
 func AdminUserInfo(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	// 从token中获取用户id
@@ -92,18 +116,15 @@ func AdminUserInfo(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		Message: "登录路由",
 		Data:    res,
 	}
-
 	utils.SendNormalResponse(w, *tmp, 200)
-
 }
 
+// 登出
 func AdminUserLogout(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-
 	tmp := &defs.NormalResponse{
 		Code:    200,
 		Message: "登出成功",
 		Data:    "",
 	}
-
 	utils.SendNormalResponse(w, *tmp, 200)
 }

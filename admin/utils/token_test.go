@@ -17,11 +17,11 @@ func TestToken(t *testing.T) {
 func cToken(t *testing.T) {
 	user := defs.User{
 		Id:         1,
-		Name:       "阿飞",
+		UserName:       "阿飞",
 		PassWord:   "1234578945",
-		Avatar:     "sadf",
-		Iphone:     "15718815231",
-		ShowTime:   "污了",
+		Icon:     "sadf",
+		Email:     "1325132780@qq.com",
+		LoginTime:   "污了",
 		CreateTime: "污了",
 	}
 	token, err := GenerateToken(&user)
@@ -38,5 +38,5 @@ func pToken(t *testing.T) {
 	if err != nil {
 		fmt.Printf("parser token err : %v", err)
 	}
-	fmt.Printf("iphone: %v\n", res.Iphone)
+	fmt.Printf("iphone: %v\n", res.Email)
 }

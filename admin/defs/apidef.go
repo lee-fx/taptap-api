@@ -3,18 +3,36 @@ package defs
 // User
 type User struct {
 	Id         int64  `json:"id"`
-	Name       string `json:"name"`
+	UserName   string `json:"username"`
+	NickName   string `json:"nickName"`
 	PassWord   string `json:"passWord"`
 	Icon       string `json:"icon"`
-	Iphone     string `json:"iphone"`
-	ShowTime   string `json:"showTime"`
+	Email      string `json:"email"`
+	Note       string `json:"note"`
 	CreateTime string `json:"createTime"`
+	LoginTime  string `json:"loginTime"`
+	Status     string `json:"status"`
+}
+
+// User List
+type UserList struct {
+	PageNum   int    `json:"pageNum"`
+	PageSize  int    `json:"pageSize"`
+	TotalPage int    `json:"totalPage"`
+	Total     int    `json:"total"`
+	List      []*User `json:"list"`
 }
 
 // login requests
 type UserLogin struct {
 	UserName string `json:"username"`
 	PassWord string `json:"password"`
+}
+
+// 分页参数
+type PageParams struct {
+	PageNum  int `json:"pageNum"`
+	PageSize int `json:"pageSize"`
 }
 
 //
