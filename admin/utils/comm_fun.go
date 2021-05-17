@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	uuid "github.com/satori/go.uuid"
+	"regexp"
+	"time"
 )
 
 // 生成uuid
@@ -42,4 +44,17 @@ func GetPageLimit(num int, page int) int {
 	}
 
 	return maxpage
+}
+
+// 校验邮箱
+func VerifyEmailFormat(email string) bool {
+	pattern := `\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*` //匹配电子邮箱
+	reg := regexp.MustCompile(pattern)
+	return reg.MatchString(email)
+}
+
+// 获取当前时间字符串格式 2017-04-11 13:24:04
+func GetTimeNowFormatDate() string {
+	timeNow := time.Now().Format("2006-01-02 15:04:05")
+	return timeNow
 }

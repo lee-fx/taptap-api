@@ -16,17 +16,70 @@ import (
 	"net/http"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func AdminUserRegister(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	res, _ := ioutil.ReadAll(r.Body)
-	ubody := &defs.UserLogin{}
+	ubody := &defs.User{}
 	if err := json.Unmarshal(res, ubody); err != nil {
 		utils.SendErrorResponse(w, defs.ErrorRequestBodyParseFailed)
 		return
 	}
-	if err := dbops.AddUserCredential(ubody.UserName, ubody.PassWord); err != nil {
+	// 用户新加校验
+
+	// 邮箱格式
+	if !utils.VerifyEmailFormat(ubody.Email) {
+		utils.SendErrorResponse(w, defs.ErrorUserEmailValidateFaild)
+		return
+	}
+
+	// 是否为空
+	if ubody.NickName == "" {
+		utils.SendErrorResponse(w, defs.ErrorUserNikeNameIsEmpty)
+		return
+	}
+	if ubody.PassWord == "" {
+		utils.SendErrorResponse(w, defs.ErrorUserPwdIsEmpty)
+		return
+	}
+	if ubody.UserName == "" {
+		utils.SendErrorResponse(w, defs.ErrorUserUserNameIsEmpty)
+		return
+	}
+
+	// 是否存在同名
+	if b := dbops.GetUserByUserName(ubody.UserName); !b {
+		utils.SendErrorResponse(w, defs.ErrorUserIsHave)
+		return
+	}
+
+	if err := dbops.AdminUserRegister(ubody); err != nil {
 		utils.SendErrorResponse(w, defs.ErrorDBError)
 		return
 	}
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "添加用户成功",
+		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 201)
+}
+
+func AdminUserDelete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	id, _ := strconv.Atoi(p.ByName("id"))
+	err := dbops.AdminUserDelete(id)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "删除成功",
+		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
 }
 
 // 查询所有用户
@@ -37,7 +90,10 @@ func AdminUserList(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	page, _ := strconv.Atoi(params["pageNum"][0])
 	to, _ := strconv.Atoi(params["pageSize"][0])
 
-	res, err := dbops.AdminUserList(page, to)
+	// 查询参数
+	keyword := params.Get("keyword")
+
+	res, err := dbops.AdminUserList(page, to, keyword)
 	if err != nil {
 		log.Printf("error: %v ", err)
 		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
@@ -51,7 +107,6 @@ func AdminUserList(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	}
 
 	utils.SendNormalResponse(w, *resData, 200)
-
 }
 
 // 用户登录

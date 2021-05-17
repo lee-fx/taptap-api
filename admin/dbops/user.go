@@ -34,52 +34,70 @@ func VerifyUserLogin(info *defs.UserLogin) (*defs.User, error) {
 
 }
 
-func AddUserCredential(loginName string, pwd string) error {
-	stmtIns, err := dbConn.Prepare("INSERT INTO users (login_name, pwd) VALUES(?, ?)")
+func AdminUserRegister(user *defs.User) error {
+	password := utils.GetMD5HashCode([]byte(user.PassWord))
+	stmtIns, err := dbConn.Prepare("INSERT INTO admin_user (username, nickname, password, email, note, status, create_time, login_time) VALUES(?,?,?,?,?,?,?,?)")
 	if err != nil {
+		fmt.Printf("error: %v", err)
 		return err
 	}
-	_, err = stmtIns.Exec(loginName, pwd)
+	timeNow := utils.GetTimeNowFormatDate()
+	_, err = stmtIns.Exec(user.UserName, user.NickName, password, user.Email, user.Note, user.Status, timeNow, timeNow)
 	if err != nil {
+		fmt.Printf("error: %v", err)
 		return err
 	}
 	defer stmtIns.Close() // 函数栈回收的时候会调用
 	return nil
 }
 
-func GetUserCredential(loginName string) (string, error) {
-	stmtOut, err := dbConn.Prepare("SELECT pwd FROM users WHERE login_name = ?")
+func GetUserByUserName(username string) bool {
+	stmtOut, err := dbConn.Prepare("SELECT id FROM admin_user WHERE username = ?")
 	if err != nil {
-		log.Printf("get user error: %s", err)
-		return "", err
+		log.Printf("get userByUserName error: %s", err)
+		return true
 	}
-	var pwd string
-	err = stmtOut.QueryRow(loginName).Scan(&pwd)
-	if err != nil && err != sql.ErrNoRows {
-		return "", err
+	var id string
+	err = stmtOut.QueryRow(username).Scan(&id)
+	if err != nil {
+		log.Printf("get userByUserName scan error: %s", err)
+		return true
+	}
+
+	if err == sql.ErrNoRows {
+		return true
 	}
 	stmtOut.Close()
-	return pwd, nil
+
+	return false
 }
 
-func DeleteUser(loginName string, pwd string) error {
-	stmtDel, err := dbConn.Prepare("DELETE FROM users WHERE login_name=? AND pwd=?")
+func AdminUserDelete(id int) error {
+	stmtDel, err := dbConn.Prepare("DELETE FROM admin_user WHERE id=?")
 	if err != nil {
 		log.Printf("delete user error: %s", err)
 	}
-	_, err = stmtDel.Exec(loginName, pwd)
+	_, err = stmtDel.Exec(id)
 	defer stmtDel.Close()
 	return nil
 }
 
 // 获取用户列表
-func AdminUserList(page, to int) (*defs.UserList, error) {
+func AdminUserList(page, to int, keyword string) (*defs.UserList, error) {
 
 	userList := &defs.UserList{}
 	userList.PageNum = page // 1
 	userList.PageSize = to  // 10
 
-	totalRow, err := dbConn.Query("SELECT COUNT(*) FROM admin_user WHERE del_flag = 0")
+	// 多字段模糊查询构造
+	whereKeyWord := ""
+	if keyword == "" {
+		whereKeyWord = "%"
+	} else {
+		whereKeyWord = "%" + keyword + "%"
+	}
+
+	totalRow, err := dbConn.Query("SELECT COUNT(*) FROM admin_user WHERE CONCAT(username, nickname) like '" + whereKeyWord + "' AND del_flag = 0")
 	if err != nil {
 		fmt.Println("get total users sql error", err)
 		return nil, err
@@ -101,13 +119,14 @@ func AdminUserList(page, to int) (*defs.UserList, error) {
 	userList.Total = total
 	userList.TotalPage = maxpage
 
-	stmtUser, err := dbConn.Prepare("SELECT id, username, password, icon, email, nickname, note, create_time, login_time, status FROM admin_user WHERE del_flag = 0 LIMIT ?,?")
+	// 模糊查询 CONCAT
+	stmtUser, err := dbConn.Prepare("SELECT id, username, password, icon, email, nickname, note, create_time, login_time, status FROM admin_user WHERE CONCAT(username, nickname) like '" + whereKeyWord + "' AND del_flag = 0 LIMIT ?,?")
 	defer stmtUser.Close()
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("get user info err: %s", err)
 		return userList, err
 	}
-	stmtRows, err := stmtUser.Query(page-1, to)
+	stmtRows, err := stmtUser.Query((page-1)*to, to)
 	for stmtRows.Next() {
 		line := &defs.User{}
 		err = stmtRows.Scan(&line.Id, &line.UserName, &line.PassWord, &line.Icon, &line.Email, &line.NickName, &line.Note, &line.CreateTime, &line.LoginTime, &line.Status)

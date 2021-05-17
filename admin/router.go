@@ -20,6 +20,8 @@ func RegisterHandlers() *httprouter.Router {
 
 	// user curd
 	router.GET("/admin/list", controllers.AdminUserList)
+	router.POST("/admin/register", controllers.AdminUserRegister)
+	router.POST("/admin/delete/:id", controllers.AdminUserDelete)
 
 	// role curd
 	router.GET("/role/listAll", controllers.AdminRoleList)

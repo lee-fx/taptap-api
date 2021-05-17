@@ -5,21 +5,21 @@ type User struct {
 	Id         int64  `json:"id"`
 	UserName   string `json:"username"`
 	NickName   string `json:"nickName"`
-	PassWord   string `json:"passWord"`
+	PassWord   string `json:"password"`
 	Icon       string `json:"icon"`
 	Email      string `json:"email"`
 	Note       string `json:"note"`
 	CreateTime string `json:"createTime"`
 	LoginTime  string `json:"loginTime"`
-	Status     string `json:"status"`
+	Status     int    `json:"status"`
 }
 
 // User List
 type UserList struct {
-	PageNum   int    `json:"pageNum"`
-	PageSize  int    `json:"pageSize"`
-	TotalPage int    `json:"totalPage"`
-	Total     int    `json:"total"`
+	PageNum   int     `json:"pageNum"`
+	PageSize  int     `json:"pageSize"`
+	TotalPage int     `json:"totalPage"`
+	Total     int     `json:"total"`
 	List      []*User `json:"list"`
 }
 
