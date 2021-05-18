@@ -22,9 +22,14 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/admin/list", controllers.AdminUserList)
 	router.POST("/admin/register", controllers.AdminUserRegister)
 	router.POST("/admin/delete/:id", controllers.AdminUserDelete)
+	router.POST("/admin/updateStatus/:id", controllers.AdminUpdateUserStatus)
+	router.POST("/admin/update/:id", controllers.AdminUpdateUser)
 
 	// role curd
 	router.GET("/role/listAll", controllers.AdminRoleList)
+	router.GET("/admin/role/:id", controllers.AdminRoles)
+	router.POST("/admin/role/update", controllers.AdminRoleUpdate)
+
 
 	// menu curd
 

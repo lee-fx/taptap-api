@@ -29,6 +29,14 @@ func (m middleWareHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var urlList []string
 	urlList = append(urlList, "/admin/info")
 	urlList = append(urlList, "/admin/logout")
+	urlList = append(urlList, "/admin/list")
+	urlList = append(urlList, "/admin/register")
+	urlList = append(urlList, "/admin/delete/")
+	urlList = append(urlList, "/admin/updateStatus/")
+	urlList = append(urlList, "/admin/update/")
+	urlList = append(urlList, "/role/listAll")
+	urlList = append(urlList, "/admin/role/")
+	urlList = append(urlList, "/admin/role/update")
 
 	if arrays.ContainsString(urlList, r.RequestURI) > -1 {
 		//check jwt-token
