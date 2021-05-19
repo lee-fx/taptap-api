@@ -3,17 +3,13 @@ package controllers
 import (
 	"api/admin/dbops"
 	"api/admin/defs"
-	"log"
-	"strconv"
-
-	//"strconv"
-
-	//"api/admin/session"
 	"api/admin/utils"
 	"encoding/json"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"strconv"
 )
 
 func AdminUserRegister(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -110,7 +106,7 @@ func AdminUpdateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params
 		Data:    nil,
 	}
 
-	utils.SendNormalResponse(w, *resData, 201)
+	utils.SendNormalResponse(w, *resData, 200)
 }
 
 // 删除用户
@@ -152,7 +148,7 @@ func AdminUserList(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 	resData := &defs.NormalResponse{
 		Code:    200,
-		Message: "登陆成功",
+		Message: "查询成功",
 		Data:    res,
 	}
 

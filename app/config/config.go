@@ -59,7 +59,6 @@ func GetMysqlAdminDb() string {
 }
 
 
-
 func GetRedisAddr() string {
 	return configuration.REDIS_ADDR
 }

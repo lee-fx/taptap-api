@@ -23,7 +23,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		utils.SendErrorResponse(w, defs.ErrorDBError)
 		return
 	}
-
 	id := session.GenerateNewSesssionId(ubody.Username)
 	su := &defs.SignedUp{
 		Success:   true,

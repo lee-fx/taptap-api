@@ -26,14 +26,26 @@ func RegisterHandlers() *httprouter.Router {
 	router.POST("/admin/update/:id", controllers.AdminUpdateUser)
 
 	// role curd
-	router.GET("/role/listAll", controllers.AdminRoleList)
+	router.GET("/role/listAll", controllers.AdminRoleListAll)
 	router.GET("/admin/role/:id", controllers.AdminRoles)
 	router.POST("/admin/role/update", controllers.AdminRoleUpdate)
-
+	router.GET("/role/list", controllers.AdminRoleList)
+	router.POST("/role/updateStatus/:rid", controllers.RoleUpdateStatus)
+	router.POST("/role/delete", controllers.RoleDelete)
+	router.POST("/role/create", controllers.RoleCreate)
+	router.POST("/role/update/:rid", controllers.RoleUpdate)
+	router.GET("/role/listResource/:rid", controllers.RoleResourceByRoleId)
+	router.POST("/role/allocResource", controllers.RoleAllocResource)
+	router.GET("/role/listMenu/:rid", controllers.RoleListMenuByRid)
 
 	// menu curd
+	router.GET("/menu/treeList", controllers.MenuTreeList)
 
 	// resource curd
+	router.GET("/resource/listAll", controllers.ResourceListAll)
+
+	// resourceCategory curd
+	router.GET("/resourceCategory/listAll", controllers.ResourceCategoryListAll)
 
 	return router
 }

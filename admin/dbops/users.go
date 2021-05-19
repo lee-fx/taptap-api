@@ -12,7 +12,7 @@ import (
 // 登录校验
 func VerifyUserLogin(info *defs.UserLogin) (*defs.User, error) {
 	username := info.UserName
-	password := utils.GetMD5HashCode([]byte(info.UserName))
+	password := utils.GetMD5HashCode([]byte(info.PassWord))
 	//fmt.Println(password)
 	userInfo := &defs.User{}
 	stmtOut, err := dbConn.Prepare("SELECT id, email FROM admin_user WHERE username = ? AND password = ? AND del_flag = 0")
@@ -148,6 +148,62 @@ func AdminUserList(page, to int, keyword string) (*defs.UserList, error) {
 	return userList, nil
 }
 
+func AdminRoleList(page, to int, keyword string) (*defs.RoleList, error) {
+	roleList := &defs.RoleList{}
+	roleList.PageNum = page // 1
+	roleList.PageSize = to  // 10
+
+	// 多字段模糊查询构造
+	whereKeyWord := ""
+	if keyword == "" {
+		whereKeyWord = "%"
+	} else {
+		whereKeyWord = "%" + keyword + "%"
+	}
+
+	totalRow, err := dbConn.Query("SELECT COUNT(*) FROM admin_role WHERE CONCAT(name, description) like '" + whereKeyWord + "' AND status = 1")
+	if err != nil {
+		fmt.Println("get total roles sql error", err)
+		return nil, err
+	}
+	total := 0
+	for totalRow.Next() {
+		err := totalRow.Scan(
+			&total,
+		)
+		if err != nil {
+			fmt.Println("get total roles error", err)
+			continue
+		}
+	}
+	totalRow.Close()
+
+	// 获取总页数
+	maxpage := utils.GetPageLimit(total, to)
+	roleList.Total = total
+	roleList.TotalPage = maxpage
+
+	// 模糊查询 CONCAT
+	stmtRole, err := dbConn.Prepare("SELECT id, name, description, admin_count, create_time, status, sort FROM admin_role WHERE CONCAT(name, description) like '" + whereKeyWord + "' AND status = 1 LIMIT ?,?")
+	defer stmtRole.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get role info err: %s", err)
+		return roleList, err
+	}
+	stmtRows, err := stmtRole.Query((page-1)*to, to)
+	for stmtRows.Next() {
+		line := &defs.Role{}
+		err = stmtRows.Scan(&line.Id, &line.Name, &line.Description, &line.AdminCount, &line.CreateTime, &line.Status, &line.Sort)
+		if err != nil {
+			log.Printf("roles sql scan error: %s", err)
+			return roleList, err
+		}
+		roleList.List = append(roleList.List, line)
+	}
+
+	return roleList, nil
+}
+
 // 获取用户权限信息
 func GetUserInfo(uid int64) (*defs.UserInfo, error) {
 
@@ -225,7 +281,7 @@ func AdminUpdateUserStatus(uid, status int) error {
 }
 
 // 通过id获取用户密码
-func GetUserPwdById(uid string) (string, error) {
+func GetUserPwdById(uid int64) (string, error) {
 	stmtOut, err := dbConn.Prepare("SELECT password FROM admin_user WHERE id = ?")
 	if err != nil {
 		log.Printf("get user pwd error: %s", err)
@@ -245,7 +301,7 @@ func GetUserPwdById(uid string) (string, error) {
 
 // 修改用户信息
 func AdminUpdateUser(user *defs.User) error {
-	pwd, err := GetUserPwdById(string(user.Id))
+	pwd, err := GetUserPwdById(user.Id)
 	if err != nil {
 		fmt.Printf("get pwd err: %v", err)
 		return err

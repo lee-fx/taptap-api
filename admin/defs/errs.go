@@ -23,9 +23,10 @@ var (
 	ErrorUserNikeNameIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "昵称为空.", Code: 200004, Data: nil}}
 	ErrorUserPwdIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "密码不可为空.", Code: 200005, Data: nil}}
 	ErrorUserUserNameIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "用户名不可为空.", Code: 200006, Data: nil}}
-	ErrorUserEmailValidateFaild = ErroResponse{HttpSc: 200, Error: Err{Message: "邮箱格式错误.", Code: 200003, Data: nil}}
-
+	ErrorUserEmailValidateFaild = ErroResponse{HttpSc: 200, Error: Err{Message: "邮箱格式错误.", Code: 200007, Data: nil}}
 	ErrorUserIsHave = ErroResponse{HttpSc: 200, Error: Err{Message: "用户已存在.", Code: 200008, Data: nil}}
+	ErrorRoleNameIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "角色名称为空.", Code: 200009, Data: nil}}
+
 
 	// 数据错误
 	ErrorDBError = ErroResponse{HttpSc: 200, Error: Err{Message: "DB ops failed.", Code: 300001, Data: nil}}

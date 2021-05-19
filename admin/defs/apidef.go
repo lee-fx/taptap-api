@@ -23,6 +23,15 @@ type UserList struct {
 	List      []*User `json:"list"`
 }
 
+// Role List
+type RoleList struct {
+	PageNum   int     `json:"pageNum"`
+	PageSize  int     `json:"pageSize"`
+	TotalPage int     `json:"totalPage"`
+	Total     int     `json:"total"`
+	List      []*Role `json:"list"`
+}
+
 // login requests
 type UserLogin struct {
 	UserName string `json:"username"`
@@ -34,8 +43,6 @@ type PageParams struct {
 	PageNum  int `json:"pageNum"`
 	PageSize int `json:"pageSize"`
 }
-
-//
 
 // response
 type NormalResponse struct {
@@ -78,4 +85,22 @@ type Role struct {
 	CreateTime  string `json:"createTime"`
 	Status      int    `json:"status"`
 	Sort        int    `json:"sort"`
+}
+
+// resourceCategory
+type ResourceCategory struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Sort int `json:"sort"`
+	CreateTime string `json:"createTime"`
+}
+
+// resource 
+type Resource struct {
+	Id int `json:"id"`
+	Name string `json:"name"`
+	Url string `json:"url"`
+	Description string `json:"description"`
+	CategoryId int `json:"categoryId"`
+	CreateTime string `json:"createTime"`
 }
