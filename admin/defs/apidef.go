@@ -61,6 +61,7 @@ type Menu struct {
 	Name       string `json:"name"`
 	Icon       string `json:"icon"`
 	Hidden     int    `json:"hidden"`
+	Children   []*Menu `json:"children"`
 }
 
 // user info
@@ -89,18 +90,32 @@ type Role struct {
 
 // resourceCategory
 type ResourceCategory struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	Sort int `json:"sort"`
+	Id         int    `json:"id"`
+	Name       string `json:"name"`
+	Sort       int    `json:"sort"`
 	CreateTime string `json:"createTime"`
 }
 
 // resource 
 type Resource struct {
-	Id int `json:"id"`
-	Name string `json:"name"`
-	Url string `json:"url"`
+	Id          int    `json:"id"`
+	Name        string `json:"name"`
+	Url         string `json:"url"`
 	Description string `json:"description"`
-	CategoryId int `json:"categoryId"`
-	CreateTime string `json:"createTime"`
+	CategoryId  int    `json:"categoryId"`
+	CreateTime  string `json:"createTime"`
+}
+
+// Menu Tree
+type MenuTree struct {
+	Id         int        `json:"id"`
+	ParentId   int        `json:"parentId"`
+	CreateTime string     `json:"createTime"`
+	Title      string     `json:"title"`
+	Level      int        `json:"level"`
+	Sort       int        `json:"sort"`
+	Name       string     `json:"name"`
+	Icon       string     `json:"icon"`
+	Hidden     int        `json:"hidden"`
+	Children   []*MenuTree `json:"children"`
 }

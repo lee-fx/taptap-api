@@ -28,6 +28,7 @@ func MenuTreeList() ([]*defs.Menu, error) {
 		}
 		menus = append(menus, &line)
 	}
+
 	defer stmtOut.Close()
 	return menus, nil
 }
