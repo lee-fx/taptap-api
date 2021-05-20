@@ -19,40 +19,43 @@ func RegisterHandlers() *httprouter.Router {
 	router.POST("/admin/logout", controllers.AdminUserLogout)
 
 	// user curd
-	router.GET("/admin/list", controllers.AdminUserList)
+
 	router.POST("/admin/register", controllers.AdminUserRegister)
-	router.POST("/admin/delete/:id", controllers.AdminUserDelete)
-	router.POST("/admin/updateStatus/:id", controllers.AdminUpdateUserStatus)
 	router.POST("/admin/update/:id", controllers.AdminUpdateUser)
+	router.POST("/admin/delete/:id", controllers.AdminUserDelete)
+	router.GET("/admin/list", controllers.AdminUserList)
+	router.POST("/admin/updateStatus/:id", controllers.AdminUpdateUserStatus)
 
 	// role curd
-	router.GET("/role/listAll", controllers.AdminRoleListAll)
-	router.GET("/admin/role/:id", controllers.AdminRoles)
-	router.POST("/admin/role/update", controllers.AdminRoleUpdate)
-	router.GET("/role/list", controllers.AdminRoleList)
-	router.POST("/role/updateStatus/:rid", controllers.RoleUpdateStatus)
-	router.POST("/role/delete", controllers.RoleDelete)
 	router.POST("/role/create", controllers.RoleCreate)
 	router.POST("/role/update/:rid", controllers.RoleUpdate)
+	router.POST("/role/delete", controllers.RoleDelete)
+	router.GET("/admin/role/:id", controllers.AdminRoles)
+	router.GET("/role/listAll", controllers.AdminRoleListAll)
+	router.GET("/role/list", controllers.AdminRoleList)
+	router.POST("/role/updateStatus/:rid", controllers.RoleUpdateStatus)
+	router.POST("/admin/role/update", controllers.AdminRoleUpdate)
 	router.GET("/role/listResource/:rid", controllers.RoleResourceByRoleId)
 	router.POST("/role/allocResource", controllers.RoleAllocResource)
 	router.GET("/role/listMenu/:rid", controllers.RoleListMenuByRid)
 	router.POST("/role/allocMenu", controllers.RoleAllocMenu)
 
 	// menu curd
-	router.GET("/menu/treeList", controllers.MenuTreeList)
-	router.GET("/menu/list/:pid", controllers.GetMenuListByPid)
-	router.POST("/menu/updateHidden/:mid", controllers.MenuUpdateHidden)
 	router.POST("/menu/create", controllers.MenuCreate)
+	router.POST("/menu/update/:mid", controllers.MenuUpdateByMid)
 	router.POST("/menu/delete/:mid", controllers.MenuDeleteByMid)
 	router.GET("/menu/getMenu/:id", controllers.GetMenuInfoById)
-	router.POST("/menu/update/:mid", controllers.MenuUpdateByMid)
+	router.GET("/menu/list/:pid", controllers.GetMenuListByPid)
+	router.GET("/menu/treeList", controllers.MenuTreeList)
+	router.POST("/menu/updateHidden/:mid", controllers.MenuUpdateHidden)
 
 	// resource curd
 	router.GET("/resource/listAll", controllers.ResourceListAll)
+	router.GET("/resource/list", controllers.ResourceList)
 
 	// resourceCategory curd
 	router.GET("/resourceCategory/listAll", controllers.ResourceCategoryListAll)
+	router.POST("/resourceCategory/create", controllers.ResourceCategoryCreate)
 
 	return router
 }

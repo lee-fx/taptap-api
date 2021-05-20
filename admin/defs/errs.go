@@ -26,6 +26,7 @@ var (
 	ErrorUserEmailValidateFaild = ErroResponse{HttpSc: 200, Error: Err{Message: "邮箱格式错误.", Code: 200007, Data: nil}}
 	ErrorUserIsHave = ErroResponse{HttpSc: 200, Error: Err{Message: "用户已存在.", Code: 200008, Data: nil}}
 	ErrorRoleNameIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "角色名称为空.", Code: 200009, Data: nil}}
+	ErrorResourceCategoryIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "资源分类名称为空.", Code: 200010, Data: nil}}
 
 
 	// 数据错误

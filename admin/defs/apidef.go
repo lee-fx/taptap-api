@@ -32,6 +32,15 @@ type RoleList struct {
 	List      []*Role `json:"list"`
 }
 
+// Resource
+type ResourceList struct {
+	PageNum   int         `json:"pageNum"`
+	PageSize  int         `json:"pageSize"`
+	TotalPage int         `json:"totalPage"`
+	Total     int         `json:"total"`
+	List      []*Resource `json:"list"`
+}
+
 // Menu List
 type MenuList struct {
 	PageNum   int     `json:"pageNum"`
@@ -101,7 +110,7 @@ type Role struct {
 type ResourceCategory struct {
 	Id         int    `json:"id"`
 	Name       string `json:"name"`
-	Sort       int    `json:"sort"`
+	Sort       int    `json:"sort, string"`
 	CreateTime string `json:"createTime"`
 }
 
