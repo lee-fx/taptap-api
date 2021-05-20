@@ -129,7 +129,7 @@ func RoleCreate(role *defs.Role) error {
 	return nil
 }
 
-// 修改角色 RoleUpdate
+// 修改角色
 func RoleUpdate(role *defs.Role) error {
 
 	stmtUpdate, err := dbConn.Prepare("UPDATE admin_role SET name=?, description=?, admin_count=?, create_time=?, status=?, sort=? WHERE id = ?")
@@ -225,4 +225,36 @@ func RoleListMenuByRid(rid int) ([]*defs.Menu, error) {
 	}
 	defer stmtOut.Close()
 	return menus, nil
+}
+
+// 分配角色菜单
+func RoleAllocMenu(rid int, ids string) error {
+	// 删除当前用户角色
+	stmtDel, err := dbConn.Prepare("DELETE FROM admin_role_menu_relation WHERE role_id = ?")
+	if err != nil {
+		log.Printf("delete admin_role_menu_relation by rid error: %s", err)
+	}
+	_, err = stmtDel.Exec(rid)
+	defer stmtDel.Close()
+
+	if ids == "" {
+		return nil
+	}
+
+	idsArr := strings.Split(ids, ",")
+	for _, m_id := range idsArr {
+		// 增加关系
+		stmtIns, err := dbConn.Prepare("INSERT INTO admin_role_menu_relation (role_id, menu_id) VALUES(?,?)")
+		if err != nil {
+			fmt.Printf("insert admin role menu relation error: %v", err)
+			return err
+		}
+		_, err = stmtIns.Exec(rid, m_id)
+		if err != nil {
+			fmt.Printf("insert admin role menu relation exe error: %v", err)
+			return err
+		}
+		defer stmtIns.Close()
+	}
+	return nil
 }

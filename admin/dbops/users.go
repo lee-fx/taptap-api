@@ -254,7 +254,7 @@ func GetUserInfo(uid int64) (*defs.UserInfo, error) {
 
 		menuRows, err := stmtMenus.Query(&id)
 		for menuRows.Next() {
-			menu := defs.Menu{}
+			menu := &defs.Menu{}
 			err = menuRows.Scan(&menu.Id, &menu.ParentId, &menu.CreateTime, &menu.Title, &menu.Level, &menu.Sort, &menu.Name, &menu.Icon, &menu.Hidden)
 			if err != nil {
 				log.Printf("menus sql scan error: %s", err)

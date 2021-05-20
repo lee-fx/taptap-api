@@ -37,9 +37,16 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/role/listResource/:rid", controllers.RoleResourceByRoleId)
 	router.POST("/role/allocResource", controllers.RoleAllocResource)
 	router.GET("/role/listMenu/:rid", controllers.RoleListMenuByRid)
+	router.POST("/role/allocMenu", controllers.RoleAllocMenu)
 
 	// menu curd
 	router.GET("/menu/treeList", controllers.MenuTreeList)
+	router.GET("/menu/list/:pid", controllers.GetMenuListByPid)
+	router.POST("/menu/updateHidden/:mid", controllers.MenuUpdateHidden)
+	router.POST("/menu/create", controllers.MenuCreate)
+	router.POST("/menu/delete/:mid", controllers.MenuDeleteByMid)
+	router.GET("/menu/getMenu/:id", controllers.GetMenuInfoById)
+	router.POST("/menu/update/:mid", controllers.MenuUpdateByMid)
 
 	// resource curd
 	router.GET("/resource/listAll", controllers.ResourceListAll)

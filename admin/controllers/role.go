@@ -252,3 +252,25 @@ func RoleListMenuByRid(w http.ResponseWriter, r *http.Request, p httprouter.Para
 	}
 	utils.SendNormalResponse(w, *tmp, 200)
 }
+
+// 角色分配菜单
+func RoleAllocMenu(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	// 获取请求参数
+	r.ParseMultipartForm(32 << 20)
+	rid, _ := strconv.Atoi(r.Form.Get("roleId"))
+	ids := r.Form.Get("menuIds")
+
+	err := dbops.RoleAllocMenu(rid, ids)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	tmp := &defs.NormalResponse{
+		Code:    200,
+		Message: "操作成功",
+		Data:    nil,
+	}
+	utils.SendNormalResponse(w, *tmp, 200)
+}

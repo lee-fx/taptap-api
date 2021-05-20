@@ -32,6 +32,15 @@ type RoleList struct {
 	List      []*Role `json:"list"`
 }
 
+// Menu List
+type MenuList struct {
+	PageNum   int     `json:"pageNum"`
+	PageSize  int     `json:"pageSize"`
+	TotalPage int     `json:"totalPage"`
+	Total     int     `json:"total"`
+	List      []*Menu `json:"list"`
+}
+
 // login requests
 type UserLogin struct {
 	UserName string `json:"username"`
@@ -52,15 +61,15 @@ type NormalResponse struct {
 }
 
 type Menu struct {
-	Id         int    `json:"id"`
-	ParentId   int    `json:"parentId"`
-	CreateTime string `json:"createTime"`
-	Title      string `json:"title"`
-	Level      int    `json:"level"`
-	Sort       int    `json:"sort"`
-	Name       string `json:"name"`
-	Icon       string `json:"icon"`
-	Hidden     int    `json:"hidden"`
+	Id         int     `json:"id"`
+	ParentId   int     `json:"parentId"`
+	CreateTime string  `json:"createTime"`
+	Title      string  `json:"title"`
+	Level      int     `json:"level"`
+	Sort       int     `json:"sort,string"`
+	Name       string  `json:"name"`
+	Icon       string  `json:"icon"`
+	Hidden     int     `json:"hidden"`
 	Children   []*Menu `json:"children"`
 }
 
@@ -68,7 +77,7 @@ type Menu struct {
 type UserInfo struct {
 	Roles []string `json:"roles"`
 	Icon  string   `json:"icon"`
-	Menus []Menu   `json:"menus"`
+	Menus []*Menu  `json:"menus"`
 }
 
 // user Token
@@ -104,18 +113,4 @@ type Resource struct {
 	Description string `json:"description"`
 	CategoryId  int    `json:"categoryId"`
 	CreateTime  string `json:"createTime"`
-}
-
-// Menu Tree
-type MenuTree struct {
-	Id         int        `json:"id"`
-	ParentId   int        `json:"parentId"`
-	CreateTime string     `json:"createTime"`
-	Title      string     `json:"title"`
-	Level      int        `json:"level"`
-	Sort       int        `json:"sort"`
-	Name       string     `json:"name"`
-	Icon       string     `json:"icon"`
-	Hidden     int        `json:"hidden"`
-	Children   []*MenuTree `json:"children"`
 }

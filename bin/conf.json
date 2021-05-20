@@ -1,0 +1,13 @@
+{
+  "MYSQL_NAME": "root",
+  "MYSQL_PASSWORD": "lx123321",
+  "MYSQL_HOST": "localhost",
+  "MYSQL_PORT": "3306",
+  "MYSQL_APP_DB": "taptap",
+  "MYSQL_ADMIN_DB": "taptap",
+  "REDIS_ADDR": "localhost",
+  "REDIS_PORT": "6379",
+  "REDIS_PASSWORD": "",
+  "REDIS_APP_DB": "0",
+  "REDIS_ADMIN_DB": "1"
+}
