@@ -110,7 +110,7 @@ type Role struct {
 type ResourceCategory struct {
 	Id         int    `json:"id"`
 	Name       string `json:"name"`
-	Sort       int    `json:"sort, string"`
+	Sort       int    `json:"sort,string"`
 	CreateTime string `json:"createTime"`
 }
 

@@ -53,9 +53,15 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/resource/listAll", controllers.ResourceListAll)
 	router.GET("/resource/list", controllers.ResourceList)
 
+	router.POST("/resource/create", controllers.ResourceCreate)
+	router.POST("/resource/update/:id", controllers.ResourUpdateById)
+	router.POST("/resource/delete/:id", controllers.ResourDeleteById)
+
 	// resourceCategory curd
 	router.GET("/resourceCategory/listAll", controllers.ResourceCategoryListAll)
 	router.POST("/resourceCategory/create", controllers.ResourceCategoryCreate)
+	router.POST("/resourceCategory/delete/:id", controllers.ResourceCategoryDeleteById)
+	router.POST("/resourceCategory/update/:id", controllers.ResourceCategoryUpdateById)
 
 	return router
 }

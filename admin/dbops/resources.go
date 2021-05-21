@@ -100,6 +100,54 @@ func ResourceList(page, to int, name, url string, id int) (*defs.ResourceList, e
 	return resourceList, nil
 }
 
+// 新建资源
+func ResourceCreate(resource *defs.Resource) error {
+	stmtIns, err := dbConn.Prepare("INSERT INTO admin_resource (name, url, description, category_id, create_time) VALUES(?,?,?,?,?)")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return err
+	}
+
+	timeNow := utils.GetTimeNowFormatDate()
+
+	_, err = stmtIns.Exec(resource.Name, resource.Url, resource.Description, resource.CategoryId, timeNow)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return err
+	}
+	defer stmtIns.Close()
+	return nil
+}
+
+// 修改资源
+func ResourUpdateById(resource *defs.Resource) error {
+
+	stmtUpdate, err := dbConn.Prepare("UPDATE admin_resource SET name=?, url=?, description=?, category_id=?, create_time=? WHERE id = ?")
+	if err != nil {
+		fmt.Printf("update resource error: %v", err)
+		return err
+	}
+
+	_, err = stmtUpdate.Exec(resource.Name, resource.Url, resource.Description, resource.CategoryId, resource.CreateTime, resource.Id)
+	if err != nil {
+		fmt.Printf("update resource exec error: %v", err)
+		return err
+	}
+	defer stmtUpdate.Close()
+	return nil
+}
+
+// 删除资源
+func ResourDeleteById(id int) error {
+	stmtDel, err := dbConn.Prepare("DELETE FROM admin_resource WHERE id=?")
+	if err != nil {
+		log.Printf("delete admin_resource error: %s", err)
+	}
+	_, err = stmtDel.Exec(id)
+	defer stmtDel.Close()
+	return nil
+}
+
 func ResourceCategoryListAll() ([]*defs.ResourceCategory, error) {
 	rcList := []*defs.ResourceCategory{}
 	stmtRC, err := dbConn.Prepare("SELECT id, name, sort, create_time FROM admin_resource_category ORDER BY sort DESC")
@@ -123,7 +171,7 @@ func ResourceCategoryListAll() ([]*defs.ResourceCategory, error) {
 
 // 资源分类创建
 func ResourceCategoryCreate(rc *defs.ResourceCategory) error {
-	stmtIns, err := dbConn.Prepare("INSERT INTO admin_resource (name , sort, create_time) VALUES(?,?,?)")
+	stmtIns, err := dbConn.Prepare("INSERT INTO admin_resource_category (name, sort, create_time) VALUES(?,?,?)")
 	if err != nil {
 		fmt.Printf("ins resource category error: %v", err)
 		return err
@@ -135,5 +183,34 @@ func ResourceCategoryCreate(rc *defs.ResourceCategory) error {
 		return err
 	}
 	defer stmtIns.Close()
+	return nil
+}
+
+// id删除资源分类
+func ResourceCategoryDeleteById(id int) error {
+	stmtDel, err := dbConn.Prepare("DELETE FROM admin_resource_category WHERE id=?")
+	if err != nil {
+		log.Printf("delete  resource category error: %s", err)
+	}
+	_, err = stmtDel.Exec(id)
+	defer stmtDel.Close()
+	return nil
+}
+
+// 修改资源分类
+func ResourceCategoryUpdateById(rc *defs.ResourceCategory) error {
+
+	stmtUpdate, err := dbConn.Prepare("UPDATE admin_resource_category SET name=?, sort=?, create_time=?  WHERE id = ?")
+	if err != nil {
+		fmt.Printf("update resource category error: %v", err)
+		return err
+	}
+
+	_, err = stmtUpdate.Exec(rc.Name, rc.Sort, rc.CreateTime, rc.Id)
+	if err != nil {
+		fmt.Printf("update resource category exec error: %v", err)
+		return err
+	}
+	defer stmtUpdate.Close()
 	return nil
 }
