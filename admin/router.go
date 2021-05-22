@@ -18,15 +18,14 @@ func RegisterHandlers() *httprouter.Router {
 	// user logout
 	router.POST("/admin/logout", controllers.AdminUserLogout)
 
-	// user curd
-
+	// user
 	router.POST("/admin/register", controllers.AdminUserRegister)
 	router.POST("/admin/update/:id", controllers.AdminUpdateUser)
 	router.POST("/admin/delete/:id", controllers.AdminUserDelete)
 	router.GET("/admin/list", controllers.AdminUserList)
 	router.POST("/admin/updateStatus/:id", controllers.AdminUpdateUserStatus)
 
-	// role curd
+	// role
 	router.POST("/role/create", controllers.RoleCreate)
 	router.POST("/role/update/:rid", controllers.RoleUpdate)
 	router.POST("/role/delete", controllers.RoleDelete)
@@ -40,7 +39,7 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/role/listMenu/:rid", controllers.RoleListMenuByRid)
 	router.POST("/role/allocMenu", controllers.RoleAllocMenu)
 
-	// menu curd
+	// menu
 	router.POST("/menu/create", controllers.MenuCreate)
 	router.POST("/menu/update/:mid", controllers.MenuUpdateByMid)
 	router.POST("/menu/delete/:mid", controllers.MenuDeleteByMid)
@@ -49,7 +48,7 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/menu/treeList", controllers.MenuTreeList)
 	router.POST("/menu/updateHidden/:mid", controllers.MenuUpdateHidden)
 
-	// resource curd
+	// resource
 	router.GET("/resource/listAll", controllers.ResourceListAll)
 	router.GET("/resource/list", controllers.ResourceList)
 
@@ -57,11 +56,15 @@ func RegisterHandlers() *httprouter.Router {
 	router.POST("/resource/update/:id", controllers.ResourUpdateById)
 	router.POST("/resource/delete/:id", controllers.ResourDeleteById)
 
-	// resourceCategory curd
+	// resourceCategory
 	router.GET("/resourceCategory/listAll", controllers.ResourceCategoryListAll)
 	router.POST("/resourceCategory/create", controllers.ResourceCategoryCreate)
 	router.POST("/resourceCategory/delete/:id", controllers.ResourceCategoryDeleteById)
 	router.POST("/resourceCategory/update/:id", controllers.ResourceCategoryUpdateById)
+
+	// game
+	router.GET("/game/list", controllers.GetGameList)
+
 
 	return router
 }
