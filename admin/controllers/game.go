@@ -37,3 +37,42 @@ func GetGameList(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	utils.SendNormalResponse(w, *resData, 200)
 }
+
+// 获取所有标签
+func GetGameTag(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, err := dbops.GetGameTag()
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "查询成功",
+		Data:    res,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+}
+
+// 获取游戏标签
+func GetGameTagByGameId(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	params := r.URL.Query()
+	gid, _ := strconv.Atoi(params["game_id"][0])
+
+	res, err := dbops.GetGameTagByGameId(gid)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "查询成功",
+		Data:    res,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+}

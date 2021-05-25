@@ -58,7 +58,7 @@ func GetGameList(page, to int, name string) (*defs.GameList, error) {
 	gameList.Total = total
 	gameList.TotalPage = maxpage
 
-	stmtRole, err := dbConn.Prepare("SELECT id, icon, name, company, mana, attention, down_url, game_desc, game_size, game_version, update_time, company_tag, create_time FROM game WHERE name like " + whereName  + " LIMIT ?,?")
+	stmtRole, err := dbConn.Prepare("SELECT id, icon, name, mana, attention, down_url, game_desc, game_size, game_version, update_time, create_time, status FROM game WHERE name like " + whereName + " LIMIT ?,?")
 	defer stmtRole.Close()
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("get game info err: %s", err)
@@ -67,7 +67,7 @@ func GetGameList(page, to int, name string) (*defs.GameList, error) {
 	stmtRows, err := stmtRole.Query((page-1)*to, to)
 	for stmtRows.Next() {
 		line := &defs.Game{}
-		err = stmtRows.Scan(&line.Id, &line.Icon, &line.Name, &line.Company, &line.Mana, &line.Attention, &line.DownUrl, &line.GameDesc, &line.GameSize, &line.GameVersion, &line.UpdateTime, &line.CompanyTag, &line.CreateTime)
+		err = stmtRows.Scan(&line.Id, &line.Icon, &line.Name, &line.Mana, &line.Attention, &line.DownUrl, &line.GameDesc, &line.GameSize, &line.GameVersion, &line.UpdateTime, &line.CreateTime, &line.Status)
 		if err != nil {
 			log.Printf("game sql scan error: %s", err)
 			return gameList, err
@@ -76,4 +76,54 @@ func GetGameList(page, to int, name string) (*defs.GameList, error) {
 	}
 
 	return gameList, nil
+}
+
+// 获取所有标签
+func GetGameTag() ([]string, error) {
+
+	gameTags := []string{}
+	stmtTags, err := dbConn.Prepare("SELECT tag_name FROM game_tag")
+	defer stmtTags.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get tags info err: %s", err)
+		return gameTags, err
+	}
+	stmtRows, err := stmtTags.Query()
+	for stmtRows.Next() {
+		line := ""
+		err = stmtRows.Scan(&line)
+		if err != nil {
+			log.Printf("gettags sql scan error: %s", err)
+			return gameTags, err
+		}
+		gameTags = append(gameTags, line)
+	}
+
+	return gameTags, nil
+}
+
+
+
+// 游戏标签获取
+func GetGameTagByGameId(gid int) ([]string, error) {
+
+	gameTags := []string{}
+	stmtTags, err := dbConn.Prepare("SELECT tag_id FROM game_tag_relation WHERE game_id = ?")
+	defer stmtTags.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get game tags info err: %s", err)
+		return gameTags, err
+	}
+	stmtRows, err := stmtTags.Query(gid)
+	for stmtRows.Next() {
+		line := ""
+		err = stmtRows.Scan(&line)
+		if err != nil {
+			log.Printf("tagnames sql scan error: %s", err)
+			return gameTags, err
+		}
+		gameTags = append(gameTags, line)
+	}
+
+	return gameTags, nil
 }

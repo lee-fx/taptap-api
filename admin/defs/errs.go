@@ -16,7 +16,7 @@ var (
 	ErrorRequestBodyParseFailed = ErroResponse{HttpSc: 200, Error: Err{Message: "请求参数错误.", Code: 100001, Data: nil}}
 
 	// 校验错误
-	ErrorNotAuthUser = ErroResponse{HttpSc: 200, Error: Err{Message: "用户登录校验失败.", Code: 200001, Data: nil}}
+	ErrorNotAuthUser = ErroResponse{HttpSc: 200, Error: Err{Message: "账号密码错误.", Code: 200001, Data: nil}}
 	ErrorJwtTokenValidateFaild = ErroResponse{HttpSc: 200, Error: Err{Message: "用户token校验失败.", Code: 200002, Data: nil}}
 
 	ErrorUserEmailIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "邮箱为空.", Code: 200003, Data: nil}}

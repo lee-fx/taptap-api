@@ -26,6 +26,7 @@ github.com/julienschmidt/httprouter
 github.com/satori/go.uuid
 # github.com/wxnacy/wgo v1.0.4
 ## explicit
+github.com/wxnacy/wgo/arrays
 # go.opentelemetry.io/otel v0.19.0
 go.opentelemetry.io/otel
 go.opentelemetry.io/otel/attribute
