@@ -79,10 +79,10 @@ func GetGameList(page, to int, name string) (*defs.GameList, error) {
 }
 
 // 获取所有标签
-func GetGameTag() ([]string, error) {
+func GetGameTag() ([]*defs.GameTag, error) {
 
-	gameTags := []string{}
-	stmtTags, err := dbConn.Prepare("SELECT tag_name FROM game_tag")
+	gameTags := []*defs.GameTag{}
+	stmtTags, err := dbConn.Prepare("SELECT id, tag_name FROM game_tag")
 	defer stmtTags.Close()
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("get tags info err: %s", err)
@@ -90,8 +90,8 @@ func GetGameTag() ([]string, error) {
 	}
 	stmtRows, err := stmtTags.Query()
 	for stmtRows.Next() {
-		line := ""
-		err = stmtRows.Scan(&line)
+		line := &defs.GameTag{}
+		err = stmtRows.Scan(&line.Id, &line.TagName)
 		if err != nil {
 			log.Printf("gettags sql scan error: %s", err)
 			return gameTags, err
@@ -102,13 +102,11 @@ func GetGameTag() ([]string, error) {
 	return gameTags, nil
 }
 
-
-
 // 游戏标签获取
 func GetGameTagByGameId(gid int) ([]string, error) {
 
 	gameTags := []string{}
-	stmtTags, err := dbConn.Prepare("SELECT tag_id FROM game_tag_relation WHERE game_id = ?")
+	stmtTags, err := dbConn.Prepare("SELECT T.tag_name FROM game_tag_relation AS R RIGHT JOIN game_tag AS T ON R.tag_id = T.id WHERE R.game_id = ?")
 	defer stmtTags.Close()
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("get game tags info err: %s", err)
@@ -126,4 +124,29 @@ func GetGameTagByGameId(gid int) ([]string, error) {
 	}
 
 	return gameTags, nil
+}
+
+// 修改游戏标签
+func GameTagUpdateByGameId(gid int, gameName []string) ([]string, error) {
+
+	//gameTags := []string{}
+	//stmtTags, err := dbConn.Prepare("SELECT T.tag_name FROM game_tag_relation AS R RIGHT JOIN game_tag AS T ON R.tag_id = T.id WHERE R.game_id = ?")
+	//defer stmtTags.Close()
+	//if err != nil && err != sql.ErrNoRows {
+	//	log.Printf("get game tags info err: %s", err)
+	//	return gameTags, err
+	//}
+	//stmtRows, err := stmtTags.Query(gid)
+	//for stmtRows.Next() {
+	//	line := ""
+	//	err = stmtRows.Scan(&line)
+	//	if err != nil {
+	//		log.Printf("tagnames sql scan error: %s", err)
+	//		return gameTags, err
+	//	}
+	//	gameTags = append(gameTags, line)
+	//}
+	//
+	//return gameTags, nil
+	return nil, nil
 }

@@ -4,7 +4,10 @@ import (
 	"api/admin/dbops"
 	"api/admin/defs"
 	"api/admin/utils"
+	"encoding/json"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -75,4 +78,32 @@ func GetGameTagByGameId(w http.ResponseWriter, r *http.Request, p httprouter.Par
 	}
 
 	utils.SendNormalResponse(w, *resData, 200)
+}
+
+// 修改游戏标签
+func GameTagUpdateByGameId(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//id, _ := strconv.Atoi(p.ByName("id"))
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &defs.UserLogin{}
+	if err := json.Unmarshal(res, ubody); err != nil {
+		utils.SendErrorResponse(w, defs.ErrorRequestBodyParseFailed)
+		return
+	}
+
+	fmt.Printf("%v", tagNames)
+	//
+	//res, err := dbops.GameTagUpdateByGameId(id, tagNames)
+	//if err != nil {
+	//	log.Printf("error: %v ", err)
+	//	utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+	//	return
+	//}
+	//
+	//resData := &defs.NormalResponse{
+	//	Code:    200,
+	//	Message: "查询成功",
+	//	Data:    res,
+	//}
+	//
+	//utils.SendNormalResponse(w, *resData, 200)
 }

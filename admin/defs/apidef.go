@@ -56,6 +56,10 @@ type UserLogin struct {
 	PassWord string `json:"password"`
 }
 
+type TagName struct {
+	// 明天加油
+}
+
 // 分页参数
 type PageParams struct {
 	PageNum  int `json:"pageNum"`
