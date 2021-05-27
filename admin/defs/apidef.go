@@ -56,8 +56,9 @@ type UserLogin struct {
 	PassWord string `json:"password"`
 }
 
-type TagName struct {
-	// 明天加油
+// 修改游戏tag
+type TagNames struct {
+	TagNames string `json:"tagNames"`
 }
 
 // 分页参数

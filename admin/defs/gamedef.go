@@ -25,6 +25,21 @@ type GameList struct {
 }
 
 type GameTag struct {
-	Id int `json:"id"`
+	Id      int    `json:"id"`
 	TagName string `json:"tagName"`
+}
+
+// 公司
+type Company struct {
+	Id       int    `json:"id"`
+	Name     string `json:"name"`
+	ShortTag string `json:"shortTag"`
+}
+
+type CompanyList struct {
+	PageNum   int     `json:"pageNum"`
+	PageSize  int     `json:"pageSize"`
+	TotalPage int     `json:"totalPage"`
+	Total     int     `json:"total"`
+	List      []*Company `json:"list"`
 }

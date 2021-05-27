@@ -68,5 +68,9 @@ func RegisterHandlers() *httprouter.Router {
 	router.GET("/game/gameTagByGameId", controllers.GetGameTagByGameId)
 	router.POST("/game/update/gameTag/:id", controllers.GameTagUpdateByGameId)
 
+	// company
+	router.GET("/company/list", controllers.GetCompanyList)
+
+
 	return router
 }
