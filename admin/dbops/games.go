@@ -214,3 +214,17 @@ func GetCompanyList(page, to int) (*defs.CompanyList, error) {
 
 	return companyList, nil
 }
+
+// 修改游戏状态
+func GameUpdateStatus(gs int, ids string) error {
+	// 修改game的状态
+	sql := "UPDATE game SET status  = ? WHERE id IN " + "(" + ids + ")"
+	//fmt.Println(sql)
+	stmtUpdate, err := dbConn.Prepare(sql)
+	if err != nil {
+		log.Printf("update game status error: %s", err)
+	}
+	_, err = stmtUpdate.Exec(gs)
+	defer stmtUpdate.Close()
+	return nil
+}

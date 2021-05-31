@@ -125,3 +125,26 @@ func GetCompanyList(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 
 	utils.SendNormalResponse(w, *resData, 200)
 }
+
+// 修改游戏状态
+func GameUpdateStatus(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//获取请求参数
+	params := r.URL.Query()
+	ids := params["ids"][0]
+	gameStatus, _ := strconv.Atoi(params["gameStatus"][0])
+
+	err := dbops.GameUpdateStatus(gameStatus, ids)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "操作成功",
+		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+}
