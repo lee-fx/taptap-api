@@ -77,6 +77,22 @@ func GetGameList(page, to int, gameName string, cid int) (*defs.GameList, error)
 			log.Printf("game sql scan error: %s", err)
 			return gameList, err
 		}
+		// 查找游戏的关联公司 没有找到就为空
+		sqlCompany := "SELECT C.name, C.short_tag FROM game_company AS C RIGHT JOIN game_company_relation AS R ON R.company_id = C.id WHERE R.game_id = ?"
+		stmtGame, err := dbConn.Prepare(sqlCompany)
+		defer stmtGame.Close()
+		if err != nil && err != sql.ErrNoRows {
+			log.Printf("get company info err: %s", err)
+			return gameList, err
+		}
+		var name = ""
+		var short_tag = ""
+		err = stmtGame.QueryRow(line.Id).Scan(&name, &short_tag)
+		if err != nil {
+			log.Printf("get menu scan error: %s", err)
+			return gameList, err
+		}
+		line.Company = name + "(" + short_tag + ")"
 		gameList.List = append(gameList.List, line)
 	}
 

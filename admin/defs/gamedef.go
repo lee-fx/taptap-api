@@ -7,6 +7,7 @@ type Game struct {
 	Name        string `json:"name"`
 	Mana        string `json:"mana"`
 	Attention   string `json:"attention"`
+	Company     string `json:"company"`
 	DownUrl     string `json:"downUrl"`
 	GameDesc    string `json:"gameDesc"`
 	GameSize    string `json:"gameSize"`
