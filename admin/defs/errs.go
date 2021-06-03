@@ -36,4 +36,8 @@ var (
 
 	// 内部错误
 	ErrorInternalFaults = ErroResponse{HttpSc: 200, Error: Err{Message: "Internal service error.", Code: 400001, Data: nil}}
+
+	// upload
+	ErrorUploadFaults = ErroResponse{HttpSc: 200, Error: Err{Message: "upload error.", Code: 500001, Data: nil}}
+
 )

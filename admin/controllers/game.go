@@ -5,6 +5,7 @@ import (
 	"api/admin/defs"
 	"api/admin/utils"
 	"encoding/json"
+	"fmt"
 	"github.com/julienschmidt/httprouter"
 	"io/ioutil"
 	"log"
@@ -144,6 +145,110 @@ func GameUpdateStatus(w http.ResponseWriter, r *http.Request, p httprouter.Param
 		Code:    200,
 		Message: "操作成功",
 		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+}
+
+// 上传icon
+func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	GAME_ICON := "./static/image/icon/"
+	MAX_UPLOAD_SIZE := 1024 * 1024 * 5
+
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_UPLOAD_SIZE))
+	if err := r.ParseMultipartForm(int64(MAX_UPLOAD_SIZE)); err != nil {
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	file, handler, err := r.FormFile("file")
+	if err != nil {
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	data, err := ioutil.ReadAll(file)
+
+	if err != nil {
+		log.Printf("Read file error: %v", err)
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	gid, _ := strconv.Atoi(p.ByName("id"))
+
+	file_url := GAME_ICON + handler.Filename
+	fmt.Printf("%s", file_url)
+	err = ioutil.WriteFile(file_url, data, 0666)
+
+	if err != nil {
+		log.Printf("Write file error: %v", err)
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	// 如果存在gid则修改图片地址
+	if gid != 0 {
+		// 删除原图片
+		// 修改图片地址
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "操作成功",
+		Data:    file_url,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+}
+
+// 上传icon
+func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	GAME_ICON := "./static/pkg/apk/"
+	MAX_UPLOAD_SIZE := 1024 * 1024 * 200
+
+	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_UPLOAD_SIZE))
+	if err := r.ParseMultipartForm(int64(MAX_UPLOAD_SIZE)); err != nil {
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	file, handler, err := r.FormFile("file")
+	if err != nil {
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	data, err := ioutil.ReadAll(file)
+
+	if err != nil {
+		log.Printf("Read file error: %v", err)
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	gid, _ := strconv.Atoi(p.ByName("id"))
+
+	file_url := GAME_ICON + handler.Filename
+	fmt.Printf("%s", file_url)
+	err = ioutil.WriteFile(file_url, data, 0666)
+
+	if err != nil {
+		log.Printf("Write file error: %v", err)
+		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
+		return
+	}
+
+	// 如果存在gid则修改图片地址
+	if gid != 0 {
+		// 删除原apk
+		// 修改apk地址
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "操作成功",
+		Data:    file_url,
 	}
 
 	utils.SendNormalResponse(w, *resData, 200)
