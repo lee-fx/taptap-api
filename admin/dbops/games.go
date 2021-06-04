@@ -244,3 +244,97 @@ func GameUpdateStatus(gs int, ids string) error {
 	defer stmtUpdate.Close()
 	return nil
 }
+
+// 查看游戏名称是否存在
+func GetGameByGameName(game_name string) bool {
+
+	stmtOut, err := dbConn.Prepare("SELECT id FROM game WHERE name = ? ")
+	if err != nil {
+		log.Printf("get game name error: %s", err)
+		return true
+	}
+	var id string
+	err = stmtOut.QueryRow(game_name).Scan(&id)
+	if err != nil {
+		log.Printf("get game name scan error: %s", err)
+		return true
+	}
+
+	if err == sql.ErrNoRows {
+		return true
+	}
+	stmtOut.Close()
+
+	return false
+}
+
+// 游戏添加
+func GameCreate(game *defs.GameCreate) error {
+
+	//log.Printf("%v", game)
+	stmtIns, err := dbConn.Prepare("INSERT INTO game (name, mana, icon, attention, down_url, game_desc, game_size, game_version, update_time, create_time, status) VALUES(?,?,?,?,?,?,?,?,?,?,?)")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return err
+	}
+
+	timeNow := utils.GetTimeNowFormatDate()
+
+	_, err = stmtIns.Exec(game.Name, game.Mana, game.Image.Url, game.Attention, game.File.Url, game.Description, game.GameSize, game.GameVersion, timeNow, timeNow, game.Status)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return err
+	}
+	defer stmtIns.Close()
+
+	stmtOut, err := dbConn.Prepare("SELECT id FROM game WHERE name = ? ")
+	if err != nil {
+		log.Printf("get game name error: %s", err)
+		return err
+	}
+
+	err = stmtOut.QueryRow(game.Name).Scan(&game.Id)
+
+	if err != nil {
+		log.Printf("get game name scan error: %s", err)
+		return err
+	}
+
+	stmtOut.Close()
+
+	// 处理tag_ids
+	if game.GameTagIds != "" {
+		idsArr := strings.Split(game.GameTagIds, ",")
+		for _, tid := range idsArr {
+			// 增加关系
+			stmtInsTag, err := dbConn.Prepare("INSERT INTO game_tag_relation (game_id, tag_id) VALUES(?,?)")
+			if err != nil {
+				fmt.Printf("insert game tag relation error: %v", err)
+				return err
+			}
+			_, err = stmtInsTag.Exec(game.Id, tid)
+			if err != nil {
+				fmt.Printf("insert game tag relation exe error: %v", err)
+				return err
+			}
+			defer stmtInsTag.Close() // 函数栈回收的时候会调用
+
+		}
+	}
+
+	// 处理company_id
+	stmtInsCompany, err := dbConn.Prepare("INSERT INTO game_company_relation (game_id, company_id) VALUES(?,?)")
+	if err != nil {
+		fmt.Printf("insert game company relation error: %v", err)
+		return err
+	}
+	_, err = stmtInsCompany.Exec(game.Id, game.CompanyId)
+	if err != nil {
+		fmt.Printf("insert game company relation exe error: %v", err)
+		return err
+	}
+	defer stmtInsCompany.Close() // 函数栈回收的时候会调用
+	//
+
+	return nil
+}

@@ -30,6 +30,10 @@ var (
 	ErrorResourceNameIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "资源名称为空.", Code: 200011, Data: nil}}
 	ErrorResourceUrlIsEmpty = ErroResponse{HttpSc: 200, Error: Err{Message: "资源路径为空.", Code: 200012, Data: nil}}
 
+	// game
+	ErrorGameNameIsHave = ErroResponse{HttpSc: 200, Error: Err{Message: "游戏名称重复.", Code: 210000, Data: nil}}
+
+
 
 	// 数据错误
 	ErrorDBError = ErroResponse{HttpSc: 200, Error: Err{Message: "DB ops failed.", Code: 300001, Data: nil}}

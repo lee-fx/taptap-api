@@ -178,7 +178,6 @@ func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 	gid, _ := strconv.Atoi(p.ByName("id"))
 
 	file_url := GAME_ICON + handler.Filename
-	fmt.Printf("%s", file_url)
 	err = ioutil.WriteFile(file_url, data, 0666)
 
 	if err != nil {
@@ -193,10 +192,15 @@ func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 		// 修改图片地址
 	}
 
+	resObj := defs.FileUpload{
+		Name: handler.Filename,
+		Url:  file_url,
+	}
+
 	resData := &defs.NormalResponse{
 		Code:    200,
 		Message: "操作成功",
-		Data:    file_url,
+		Data:    resObj,
 	}
 
 	utils.SendNormalResponse(w, *resData, 200)
@@ -230,13 +234,17 @@ func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	gid, _ := strconv.Atoi(p.ByName("id"))
 
 	file_url := GAME_ICON + handler.Filename
-	fmt.Printf("%s", file_url)
 	err = ioutil.WriteFile(file_url, data, 0666)
 
 	if err != nil {
 		log.Printf("Write file error: %v", err)
 		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
 		return
+	}
+
+	resObj := defs.FileUpload{
+		Name: handler.Filename,
+		Url:  file_url,
 	}
 
 	// 如果存在gid则修改图片地址
@@ -248,8 +256,38 @@ func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 	resData := &defs.NormalResponse{
 		Code:    200,
 		Message: "操作成功",
-		Data:    file_url,
+		Data:    &resObj,
 	}
 
 	utils.SendNormalResponse(w, *resData, 200)
+}
+
+// 游戏添加
+func GameCreate(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &defs.GameCreate{}
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println(err)
+		utils.SendErrorResponse(w, defs.ErrorRequestBodyParseFailed)
+		return
+	}
+
+	// 是否存在游戏名称相同
+	if b := dbops.GetGameByGameName(ubody.Name); !b {
+		utils.SendErrorResponse(w, defs.ErrorGameNameIsHave)
+		return
+	}
+
+	if err := dbops.GameCreate(ubody); err != nil {
+		utils.SendErrorResponse(w, defs.ErrorDBError)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "添加资源成功",
+		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 201)
 }

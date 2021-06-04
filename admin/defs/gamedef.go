@@ -17,6 +17,21 @@ type Game struct {
 	Status      int    `json:"status"`
 }
 
+type GameCreate struct {
+	Id          int         `json:"id"`
+	Image       *FileUpload `json:"image"`
+	Attention   int         `json:"attention,string"`
+	Mana        int         `json:"mana,string"`
+	Name        string      `json:"name"`
+	GameSize    string      `json:"game_size"`
+	GameTagIds  string      `json:"game_tag_ids"`
+	GameVersion string      `json:"game_version"`
+	Status      int         `json:"status"`
+	Description string      `json:"description"`
+	File        *FileUpload `json:"file"`
+	CompanyId   int         `json:"company_id"`
+}
+
 type GameList struct {
 	PageNum   int     `json:"pageNum"`
 	PageSize  int     `json:"pageSize"`
@@ -38,9 +53,14 @@ type Company struct {
 }
 
 type CompanyList struct {
-	PageNum   int     `json:"pageNum"`
-	PageSize  int     `json:"pageSize"`
-	TotalPage int     `json:"totalPage"`
-	Total     int     `json:"total"`
+	PageNum   int        `json:"pageNum"`
+	PageSize  int        `json:"pageSize"`
+	TotalPage int        `json:"totalPage"`
+	Total     int        `json:"total"`
 	List      []*Company `json:"list"`
+}
+
+type FileUpload struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
