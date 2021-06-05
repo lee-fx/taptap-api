@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // 获取游戏列表
@@ -175,26 +176,26 @@ func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 		return
 	}
 
-	gid, _ := strconv.Atoi(p.ByName("id"))
+	//gid, _ := strconv.Atoi(p.ByName("id"))
 
-	file_url := GAME_ICON + handler.Filename
+	rand_num := utils.GetRandNumByNumber(100)
+
+	file_url := GAME_ICON + strconv.Itoa(int(rand_num)) +  handler.Filename
 	err = ioutil.WriteFile(file_url, data, 0666)
 
+	file_tmp := strings.TrimPrefix(file_url, ".")
+
+	res_file_url := "http://47.94.227.188:2333" + file_tmp
 	if err != nil {
 		log.Printf("Write file error: %v", err)
 		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
 		return
 	}
 
-	// 如果存在gid则修改图片地址
-	if gid != 0 {
-		// 删除原图片
-		// 修改图片地址
-	}
 
 	resObj := defs.FileUpload{
 		Name: handler.Filename,
-		Url:  file_url,
+		Url:  res_file_url,
 	}
 
 	resData := &defs.NormalResponse{
@@ -231,9 +232,12 @@ func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		return
 	}
 
-	gid, _ := strconv.Atoi(p.ByName("id"))
+	//gid, _ := strconv.Atoi(p.ByName("id"))
 
-	file_url := GAME_ICON + handler.Filename
+	rand_num := utils.GetRandNumByNumber(100)
+
+	file_url := GAME_ICON + strconv.Itoa(int(rand_num)) +  handler.Filename
+
 	err = ioutil.WriteFile(file_url, data, 0666)
 
 	if err != nil {
@@ -242,15 +246,13 @@ func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 		return
 	}
 
+	file_tmp := strings.TrimPrefix(file_url, ".")
+
+	res_file_url := "http://47.94.227.188:2333" + file_tmp
+
 	resObj := defs.FileUpload{
 		Name: handler.Filename,
-		Url:  file_url,
-	}
-
-	// 如果存在gid则修改图片地址
-	if gid != 0 {
-		// 删除原apk
-		// 修改apk地址
+		Url:  res_file_url,
 	}
 
 	resData := &defs.NormalResponse{
@@ -290,4 +292,23 @@ func GameCreate(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	utils.SendNormalResponse(w, *resData, 201)
+}
+
+// 修改游戏信息
+func GameUpdateInfo(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	id, _ := strconv.Atoi(p.ByName("id"))
+	res, err := dbops.GameUpdateInfo(id)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "修改成功",
+		Data:    res,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
 }

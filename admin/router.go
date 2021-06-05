@@ -69,7 +69,7 @@ func RegisterHandlers() *httprouter.Router {
 	router.POST("/game/update/gameTag/:id", controllers.GameTagUpdateByGameId)
 	router.POST("/game/update/gameStatus", controllers.GameUpdateStatus)
 	router.POST("/game/create", controllers.GameCreate)
-
+	router.GET("/game/updateInfo/:id", controllers.GameUpdateInfo)
 
 	// upload game
 	router.POST("/game/upload/icon/:id", controllers.GameUploadIcon)
@@ -77,7 +77,6 @@ func RegisterHandlers() *httprouter.Router {
 
 	// company
 	router.GET("/company/list", controllers.GetCompanyList)
-
 
 	return router
 }

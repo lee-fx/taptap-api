@@ -25,7 +25,7 @@ func GetGameList(page, to int, gameName string, cid int) (*defs.GameList, error)
 
 	sqlQuery := ""
 
-	if cid == 0 {
+	if cid == -1 {
 		sqlQuery = "SELECT COUNT(*) FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id <> ? AND G.name like " + whereName
 	} else {
 		sqlQuery = "SELECT COUNT(*) FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id = ? AND G.name like " + whereName
@@ -55,7 +55,7 @@ func GetGameList(page, to int, gameName string, cid int) (*defs.GameList, error)
 
 	sqlQueryList := ""
 
-	if cid == 0 {
+	if cid == -1 {
 		sqlQueryList = "SELECT G.id, G.icon, G.name, G.mana, G.attention, G.down_url, G.game_desc, G.game_size, G.game_version, G.update_time, G.create_time, G.status FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id <> ? AND G.name like " + whereName + " LIMIT ?,?"
 	} else {
 		sqlQueryList = "SELECT G.id, G.icon, G.name, G.mana, G.attention, G.down_url, G.game_desc, G.game_size, G.game_version, G.update_time, G.create_time, G.status FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id = ? AND G.name like " + whereName + " LIMIT ?,?"
@@ -337,4 +337,60 @@ func GameCreate(game *defs.GameCreate) error {
 	//
 
 	return nil
+}
+
+// 修改游戏获取游戏信息
+func GameUpdateInfo(gid int) (*defs.GameCreate, error) {
+	gameCreate := &defs.GameCreate{}
+	gameCreate.Id = gid
+
+	// 查询游戏数据并组装
+	sqlGame := "SELECT name, mana, attention, icon, down_url, game_desc, game_size, game_version, status  FROM game WHERE id = ?"
+	stmtGame, err := dbConn.Prepare(sqlGame)
+	defer stmtGame.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get game info err: %s", err)
+		return gameCreate, err
+	}
+	var Name string
+	var Mana string
+	var Attention = 0
+	var Image = ""
+	var File = ""
+	var Description = ""
+	var GameSize = ""
+	var GameVersion = ""
+	var Status = 0
+
+	err = stmtGame.QueryRow(gid).Scan(&Name, &Mana, &Attention, &Image, &File, &Description, &GameSize, &GameVersion, &Status)
+	if err != nil {
+		log.Printf("get game info scan error: %s", err)
+		return gameCreate, err
+	}
+
+	imag_struct := defs.FileUpload{
+		Name: "",
+		Url:  Image,
+	}
+
+	file_struct := defs.FileUpload{
+		Name: "",
+		Url:  File,
+	}
+
+	gameCreate.Name = Name
+	gameCreate.Mana = Mana
+	gameCreate.Attention = Attention
+	gameCreate.Image= &imag_struct
+	gameCreate.File = &file_struct
+	gameCreate.Description = Description
+	gameCreate.GameSize = GameSize
+	gameCreate.GameVersion = GameVersion
+	gameCreate.Status = Status
+
+	// 查找游戏的company id
+
+	// tag_ids
+
+	return gameCreate, nil
 }

@@ -19,17 +19,18 @@ type Game struct {
 
 type GameCreate struct {
 	Id          int         `json:"id"`
-	Image       *FileUpload `json:"image"`
-	Attention   int         `json:"attention,string"`
-	Mana        int         `json:"mana,string"`
 	Name        string      `json:"name"`
+	Mana        string         `json:"mana"`
+	Attention   int         `json:"attention,string"`
+	Image       *FileUpload `json:"image"`
+	File        *FileUpload `json:"file"`
+	Description string      `json:"description"`
 	GameSize    string      `json:"game_size"`
-	GameTagIds  string      `json:"game_tag_ids"`
 	GameVersion string      `json:"game_version"`
 	Status      int         `json:"status"`
-	Description string      `json:"description"`
-	File        *FileUpload `json:"file"`
-	CompanyId   int         `json:"company_id"`
+
+	CompanyId  int    `json:"company_id"`
+	GameTagIds string `json:"game_tag_ids"`
 }
 
 type GameList struct {

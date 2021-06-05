@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	uuid "github.com/satori/go.uuid"
+	"math/rand"
 	"regexp"
 	"time"
 )
@@ -57,4 +58,10 @@ func VerifyEmailFormat(email string) bool {
 func GetTimeNowFormatDate() string {
 	timeNow := time.Now().Format("2006-01-02 15:04:05")
 	return timeNow
+}
+
+// 获取随机字符串
+func GetRandNumByNumber(n int64) int64 {
+	rand.Seed(time.Now().UnixNano()) // 纳秒时间戳
+	return rand.Int63n(n)
 }
