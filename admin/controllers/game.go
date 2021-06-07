@@ -151,6 +151,28 @@ func GameUpdateStatus(w http.ResponseWriter, r *http.Request, p httprouter.Param
 	utils.SendNormalResponse(w, *resData, 200)
 }
 
+// 游戏删除
+func GameDelete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	//获取请求参数
+	params := r.URL.Query()
+	ids := params["ids"][0]
+
+	err := dbops.GameDeleteByIds(ids)
+	if err != nil {
+		log.Printf("error: %v ", err)
+		utils.SendErrorResponse(w, defs.ErrorInternalFaults)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "操作成功",
+		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 200)
+}
+
 // 上传icon
 func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	GAME_ICON := "./static/image/icon/"
@@ -287,14 +309,44 @@ func GameCreate(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	resData := &defs.NormalResponse{
 		Code:    200,
-		Message: "添加资源成功",
+		Message: "添加游戏成功",
 		Data:    nil,
 	}
 
 	utils.SendNormalResponse(w, *resData, 201)
 }
 
-// 修改游戏信息
+// 游戏修改
+func GameUpdate(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	res, _ := ioutil.ReadAll(r.Body)
+	ubody := &defs.GameCreate{}
+	if err := json.Unmarshal(res, ubody); err != nil {
+		fmt.Println(err)
+		utils.SendErrorResponse(w, defs.ErrorRequestBodyParseFailed)
+		return
+	}
+
+	// 是否存在游戏名称相同
+	if b := dbops.GameNameIsHave(ubody.Id, ubody.Name); !b {
+		utils.SendErrorResponse(w, defs.ErrorGameNameIsHave)
+		return
+	}
+
+	if err := dbops.GameUpdate(ubody); err != nil {
+		utils.SendErrorResponse(w, defs.ErrorDBError)
+		return
+	}
+
+	resData := &defs.NormalResponse{
+		Code:    200,
+		Message: "修改成功",
+		Data:    nil,
+	}
+
+	utils.SendNormalResponse(w, *resData, 201)
+}
+
+// 获取修改游戏初始信息
 func GameUpdateInfo(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	id, _ := strconv.Atoi(p.ByName("id"))
 	res, err := dbops.GameUpdateInfo(id)

@@ -7,6 +7,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 	"strings"
 )
 
@@ -56,9 +57,9 @@ func GetGameList(page, to int, gameName string, cid int) (*defs.GameList, error)
 	sqlQueryList := ""
 
 	if cid == -1 {
-		sqlQueryList = "SELECT G.id, G.icon, G.name, G.mana, G.attention, G.down_url, G.game_desc, G.game_size, G.game_version, G.update_time, G.create_time, G.status FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id <> ? AND G.name like " + whereName + " LIMIT ?,?"
+		sqlQueryList = "SELECT G.id, G.icon, G.name, G.mana, G.attention, G.down_url, G.game_desc, G.game_size, G.game_version, G.update_time, G.create_time, G.status FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id <> ? AND G.name like " + whereName + " ORDER BY id desc LIMIT ?,?"
 	} else {
-		sqlQueryList = "SELECT G.id, G.icon, G.name, G.mana, G.attention, G.down_url, G.game_desc, G.game_size, G.game_version, G.update_time, G.create_time, G.status FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id = ? AND G.name like " + whereName + " LIMIT ?,?"
+		sqlQueryList = "SELECT G.id, G.icon, G.name, G.mana, G.attention, G.down_url, G.game_desc, G.game_size, G.game_version, G.update_time, G.create_time, G.status FROM game AS G RIGHT JOIN game_company_relation AS C ON G.id = C.game_id WHERE C.company_id = ? AND G.name like " + whereName + " ORDER BY id desc LIMIT ?,?"
 	}
 
 	//fmt.Println(sqlQueryList)
@@ -245,6 +246,20 @@ func GameUpdateStatus(gs int, ids string) error {
 	return nil
 }
 
+// 删除游戏
+func GameDeleteByIds(ids string) error {
+	// 修改game的状态
+	sql := "DELETE FROM game WHERE id IN " + "(" + ids + ")"
+	//fmt.Println(sql)
+	stmtDel, err := dbConn.Prepare(sql)
+	if err != nil {
+		log.Printf("delete game error: %s", err)
+	}
+	_, err = stmtDel.Exec()
+	defer stmtDel.Close()
+	return nil
+}
+
 // 查看游戏名称是否存在
 func GetGameByGameName(game_name string) bool {
 
@@ -255,6 +270,29 @@ func GetGameByGameName(game_name string) bool {
 	}
 	var id string
 	err = stmtOut.QueryRow(game_name).Scan(&id)
+	if err != nil {
+		log.Printf("get game name scan error: %s", err)
+		return true
+	}
+
+	if err == sql.ErrNoRows {
+		return true
+	}
+	stmtOut.Close()
+
+	return false
+}
+
+// 除了修改的游戏，是否存在同名
+func GameNameIsHave(gid int, game_name string) bool {
+
+	stmtOut, err := dbConn.Prepare("SELECT id FROM game WHERE name = ? AND id != ?")
+	if err != nil {
+		log.Printf("get game name error: %s", err)
+		return true
+	}
+	var id string
+	err = stmtOut.QueryRow(game_name, gid).Scan(&id)
 	if err != nil {
 		log.Printf("get game name scan error: %s", err)
 		return true
@@ -317,7 +355,7 @@ func GameCreate(game *defs.GameCreate) error {
 				fmt.Printf("insert game tag relation exe error: %v", err)
 				return err
 			}
-			defer stmtInsTag.Close() // 函数栈回收的时候会调用
+			defer stmtInsTag.Close()
 
 		}
 	}
@@ -333,8 +371,75 @@ func GameCreate(game *defs.GameCreate) error {
 		fmt.Printf("insert game company relation exe error: %v", err)
 		return err
 	}
-	defer stmtInsCompany.Close() // 函数栈回收的时候会调用
+	defer stmtInsCompany.Close()
 	//
+
+	return nil
+}
+
+// 修改游戏
+func GameUpdate(game *defs.GameCreate) error {
+
+	stmtUpdate, err := dbConn.Prepare("UPDATE game SET name=?, mana=?, icon=?, attention=?, down_url=?, game_desc=?, game_size=?, game_version=?, update_time=?, status=? WHERE id=?")
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return err
+	}
+
+	timeNow := utils.GetTimeNowFormatDate()
+
+	_, err = stmtUpdate.Exec(game.Name, game.Mana, game.Image.Url, game.Attention, game.File.Url, game.Description, game.GameSize, game.GameVersion, timeNow, game.Status, game.Id)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return err
+	}
+	defer stmtUpdate.Close()
+
+	// 处理tag_ids
+	if game.GameTagIds != "" {
+		// 删除以前的
+		stmtDel, err := dbConn.Prepare("DELETE FROM game_tag_relation WHERE game_id=?")
+		if err != nil {
+			log.Printf("delete update game tag of update game error: %s", err)
+			return err
+		}
+		_, err = stmtDel.Exec(game.Id)
+		if err != nil {
+			log.Printf("delete update game tag of update game error: %s", err)
+			return err
+		}
+		defer stmtDel.Close()
+
+		// 新建现有的
+		idsArr := strings.Split(game.GameTagIds, ",")
+		for _, tid := range idsArr {
+			// 增加关系
+			stmtInsTag, err := dbConn.Prepare("INSERT INTO game_tag_relation (game_id, tag_id) VALUES(?,?)")
+			if err != nil {
+				fmt.Printf("insert game tag relation error: %v", err)
+				return err
+			}
+			_, err = stmtInsTag.Exec(game.Id, tid)
+			if err != nil {
+				fmt.Printf("insert game tag relation exe error: %v", err)
+				return err
+			}
+			defer stmtInsTag.Close()
+		}
+	}
+
+	// 处理company_id
+	stmtInsCompany, err := dbConn.Prepare("UPDATE game_company_relation SET company_id = ? WHERE game_id = ?")
+	if err != nil {
+		fmt.Printf("update game company relation error: %v", err)
+		return err
+	}
+	_, err = stmtInsCompany.Exec(game.CompanyId, game.Id)
+	if err != nil {
+		fmt.Printf("update game company relation exe error: %v", err)
+		return err
+	}
+	defer stmtInsCompany.Close()
 
 	return nil
 }
@@ -369,19 +474,19 @@ func GameUpdateInfo(gid int) (*defs.GameCreate, error) {
 	}
 
 	imag_struct := defs.FileUpload{
-		Name: "",
+		Name: Image,
 		Url:  Image,
 	}
 
 	file_struct := defs.FileUpload{
-		Name: "",
+		Name: File,
 		Url:  File,
 	}
 
 	gameCreate.Name = Name
 	gameCreate.Mana = Mana
 	gameCreate.Attention = Attention
-	gameCreate.Image= &imag_struct
+	gameCreate.Image = &imag_struct
 	gameCreate.File = &file_struct
 	gameCreate.Description = Description
 	gameCreate.GameSize = GameSize
@@ -389,8 +494,44 @@ func GameUpdateInfo(gid int) (*defs.GameCreate, error) {
 	gameCreate.Status = Status
 
 	// 查找游戏的company id
+	sqlCompany := "SELECT company_id FROM game_company_relation WHERE game_id = ?"
+	stmtCompany, err := dbConn.Prepare(sqlCompany)
+	defer stmtCompany.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get company id err: %s", err)
+		return gameCreate, err
+	}
+	err = stmtCompany.QueryRow(gid).Scan(&gameCreate.CompanyId)
+	if err != nil {
+		log.Printf("get company id scan error: %s", err)
+		return gameCreate, err
+	}
 
 	// tag_ids
+	ids := []string{}
+	stmtTags, err := dbConn.Prepare("SELECT tag_id FROM game_tag_relation WHERE game_id=?")
+	defer stmtTags.Close()
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("get tag ids err: %s", err)
+		return gameCreate, err
+	}
+	if err == sql.ErrNoRows {
+		gameCreate.GameTagIds = ""
+	} else {
+		stmtRows, err := stmtTags.Query(gid)
+		for stmtRows.Next() {
+			var tag_id int
+			err = stmtRows.Scan(&tag_id)
+			if err != nil {
+				log.Printf("get tag_id sql scan error: %s", err)
+				return gameCreate, err
+			}
+			ids = append(ids, strconv.Itoa(tag_id))
+		}
+
+		ids_s := strings.Join(ids, ",")
+		gameCreate.GameTagIds = ids_s
+	}
 
 	return gameCreate, nil
 }

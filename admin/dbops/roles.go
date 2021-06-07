@@ -83,7 +83,7 @@ func AdminRoleUpdate(uid int, ids string) error {
 			fmt.Printf("insert admin role relation exe error: %v", err)
 			return err
 		}
-		defer stmtIns.Close() // 函数栈回收的时候会调用
+		defer stmtIns.Close()
 
 	}
 
@@ -125,7 +125,7 @@ func RoleCreate(role *defs.Role) error {
 		fmt.Printf("ins role exe error: %v", err)
 		return err
 	}
-	defer stmtIns.Close() // 函数栈回收的时候会调用
+	defer stmtIns.Close()
 	return nil
 }
 
@@ -143,7 +143,7 @@ func RoleUpdate(role *defs.Role) error {
 		fmt.Printf("update role exec error: %v", err)
 		return err
 	}
-	defer stmtUpdate.Close() // 函数栈回收的时候会调用
+	defer stmtUpdate.Close()
 	return nil
 }
 

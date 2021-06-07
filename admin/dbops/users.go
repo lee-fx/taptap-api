@@ -49,7 +49,7 @@ func AdminUserRegister(user *defs.User) error {
 		fmt.Printf("error: %v", err)
 		return err
 	}
-	defer stmtIns.Close() // 函数栈回收的时候会调用
+	defer stmtIns.Close()
 	return nil
 }
 
@@ -324,6 +324,6 @@ func AdminUpdateUser(user *defs.User) error {
 		fmt.Printf("error: %v", err)
 		return err
 	}
-	defer stmtUpdate.Close() // 函数栈回收的时候会调用
+	defer stmtUpdate.Close()
 	return nil
 }

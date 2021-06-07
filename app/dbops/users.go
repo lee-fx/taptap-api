@@ -15,7 +15,7 @@ func AddUserCredential(loginName string, pwd string) error {
 	if err != nil {
 		return err
 	}
-	defer stmtIns.Close() // 函数栈回收的时候会调用
+	defer stmtIns.Close()
 	return nil
 }
 
