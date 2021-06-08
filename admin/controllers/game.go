@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"api/admin/config"
 )
 
 // 获取游戏列表
@@ -175,8 +176,8 @@ func GameDelete(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 // 上传icon
 func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	GAME_ICON := "./static/image/icon/"
-	MAX_UPLOAD_SIZE := 1024 * 1024 * 5
+	GAME_ICON := config.GetGameIcon()
+	MAX_UPLOAD_SIZE := config.GetMaxUploadImageSize()
 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_UPLOAD_SIZE))
 	if err := r.ParseMultipartForm(int64(MAX_UPLOAD_SIZE)); err != nil {
@@ -207,7 +208,7 @@ func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 
 	file_tmp := strings.TrimPrefix(file_url, ".")
 
-	res_file_url := "http://47.94.227.188:2333" + file_tmp
+	res_file_url := config.GetFileServerDirUrl() + file_tmp
 	if err != nil {
 		log.Printf("Write file error: %v", err)
 		utils.SendErrorResponse(w, defs.ErrorUploadFaults)
@@ -231,8 +232,8 @@ func GameUploadIcon(w http.ResponseWriter, r *http.Request, p httprouter.Params)
 
 // 上传icon
 func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	GAME_ICON := "./static/pkg/apk/"
-	MAX_UPLOAD_SIZE := 1024 * 1024 * 200
+	GAME_FILE_APK := config.GetGameFileApk()
+	MAX_UPLOAD_SIZE := config.GetMaxUploadFileSize()
 
 	r.Body = http.MaxBytesReader(w, r.Body, int64(MAX_UPLOAD_SIZE))
 	if err := r.ParseMultipartForm(int64(MAX_UPLOAD_SIZE)); err != nil {
@@ -258,7 +259,7 @@ func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 	rand_num := utils.GetRandNumByNumber(100)
 
-	file_url := GAME_ICON + strconv.Itoa(int(rand_num)) +  handler.Filename
+	file_url := GAME_FILE_APK + strconv.Itoa(int(rand_num)) +  handler.Filename
 
 	err = ioutil.WriteFile(file_url, data, 0666)
 
@@ -270,7 +271,7 @@ func GameUploadApk(w http.ResponseWriter, r *http.Request, p httprouter.Params) 
 
 	file_tmp := strings.TrimPrefix(file_url, ".")
 
-	res_file_url := "http://47.94.227.188:2333" + file_tmp
+	res_file_url := config.GetFileServerDirUrl() + file_tmp
 
 	resObj := defs.FileUpload{
 		Name: handler.Filename,
