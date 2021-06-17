@@ -33,22 +33,22 @@ func GetConfigs(content string) ([]*defs.Global, error) {
 }
 
 func GetTypeGames(num int) ([]*defs.GameTagArr, error) {
-	stmtOutNew, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE del_flag=0 ORDER BY id DESC limit ?")
+	stmtOutNew, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE status=0 ORDER BY id DESC limit ?")
 	if err != nil {
 		log.Printf("get new games error: %s", err)
 		return nil, err
 	}
-	stmtOutHot, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE del_flag=0 ORDER BY attention DESC limit ?")
+	stmtOutHot, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE status=0 ORDER BY attention DESC limit ?")
 	if err != nil {
 		log.Printf("get hot games error: %s", err)
 		return nil, err
 	}
-	stmtOutGood, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE del_flag=0 ORDER BY mana DESC limit ?")
+	stmtOutGood, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE status=0 ORDER BY mana DESC limit ?")
 	if err != nil {
 		log.Printf("get good games error: %s", err)
 		return nil, err
 	}
-	stmtOutNovel, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE del_flag=0 ORDER BY create_time DESC limit ?")
+	stmtOutNovel, err := dbConn.Prepare("SELECT id, icon, name FROM game WHERE status=0 ORDER BY create_time DESC limit ?")
 	if err != nil {
 		log.Printf("get novel games error: %s", err)
 		return nil, err

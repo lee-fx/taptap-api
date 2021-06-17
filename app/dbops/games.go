@@ -26,7 +26,7 @@ func GetAllGames(Type int, page int, to int) ([]defs.GameList, error) {
 		orderBy = "ORDER BY id desc"
 	}
 
-	stmtOut, err := dbConn.Prepare("SELECT id, icon,name, mana FROM game WHERE del_flag = 0 " + orderBy + " LIMIT ?,?")
+	stmtOut, err := dbConn.Prepare("SELECT id, icon,name, mana FROM game WHERE status = 0 " + orderBy + " LIMIT ?,?")
 
 	if err != nil {
 		log.Printf("get Games error: %s", err)
@@ -47,7 +47,8 @@ func GetAllGames(Type int, page int, to int) ([]defs.GameList, error) {
 		// 组装game_tag
 		var gameTag []defs.GameTag
 
-		stmtOutTag, err := dbConn.Prepare("SELECT tag_name FROM game_tag WHERE game_id=? limit 3")
+		stmtOutTag, err := dbConn.Prepare("SELECT GT.tag_name FROM game_tag GT INNER JOIN game_tag_relation GTR " +
+			"ON GT.id = GTR.tag_id WHERE GTR.game_id=? limit 3")
 		if err != nil {
 			log.Printf("get game tag error: %s", err)
 			return game, err
@@ -75,13 +76,13 @@ func GetAllGames(Type int, page int, to int) ([]defs.GameList, error) {
 }
 
 func GetGameInfoById(id int) (*defs.GameInfo, error) {
-	stmtOut, err := dbConn.Prepare("SELECT id, name, icon, company, mana, attention, down_url, game_desc, game_size, game_version, update_time, company_tag FROM game WHERE del_flag = 0 AND id=?")
+	stmtOut, err := dbConn.Prepare("SELECT id, name, icon, mana, attention, down_url, game_desc, game_size, game_version, update_time FROM game WHERE status = 0 AND id=?")
 	if err != nil {
 		log.Printf("get Games error: %s", err)
 		return nil, err
 	}
 	game := &defs.GameInfo{}
-	err = stmtOut.QueryRow(id).Scan(&game.Id, &game.Name, &game.Icon, &game.Company, &game.Mana, &game.Attention, &game.DownUrl, &game.GameDesc, &game.GameSize, &game.GameVersion, &game.UpdateTime, &game.CompanyTag)
+	err = stmtOut.QueryRow(id).Scan(&game.Id, &game.Name, &game.Icon, &game.Mana, &game.Attention, &game.DownUrl, &game.GameDesc, &game.GameSize, &game.GameVersion, &game.UpdateTime)
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("error: %s", err)
 
@@ -90,7 +91,25 @@ func GetGameInfoById(id int) (*defs.GameInfo, error) {
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	defer stmtOut.Close()
+
+	stmtCompany, err := dbConn.Prepare("SELECT GC.name FROM game_company_relation GCR INNER JOIN game_company GC ON GCR.company_id = GC.id" +
+		" WHERE GCR.game_id=?")
+	if err != nil {
+		log.Printf("get Game company error: %s", err)
+		return nil, err
+	}
+
+	err = stmtCompany.QueryRow(id).Scan(&game.Company)
+	if err != nil && err != sql.ErrNoRows {
+		log.Printf("error: %s", err)
+
+		return nil, err
+	}
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	defer stmtCompany.Close()
 	return game, nil
 }
 
@@ -98,7 +117,7 @@ func GetRecommends(Type int, page int, to int) ([]defs.RecommondGame, error) {
 	start := (page - 1) * to
 	var games []defs.RecommondGame
 
-	stmtOut, err := dbConn.Prepare("SELECT id, icon,name, mana FROM game WHERE del_flag = 0 LIMIT ?,?")
+	stmtOut, err := dbConn.Prepare("SELECT id, icon,name, mana FROM game WHERE status = 0 LIMIT ?,?")
 
 	if err != nil {
 		log.Printf("get Games error: %s", err)
@@ -119,7 +138,8 @@ func GetRecommends(Type int, page int, to int) ([]defs.RecommondGame, error) {
 		// 组装game_tag
 		var gameTag []defs.GameTag
 
-		stmtOutTag, err := dbConn.Prepare("SELECT tag_name FROM game_tag WHERE game_id=? limit 3")
+		stmtOutTag, err := dbConn.Prepare("SELECT GT.tag_name FROM game_tag GT INNER JOIN game_tag_relation GTR " +
+			"ON GT.id = GTR.tag_id WHERE GTR.game_id=? limit 3")
 		if err != nil {
 			log.Printf("get game tag error: %s", err)
 			return games, err
