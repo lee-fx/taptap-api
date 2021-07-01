@@ -31,8 +31,9 @@ type Configuration struct {
 var configuration *Configuration
 
 func init() {
-	file_json_url := GetFileJsonUrl()
-	file, _ := os.Open(file_json_url)
+	//file_json_url := GetFileJsonUrl()
+	//file, _ := os.Open(file_json_url)
+	file, _ := os.Open("./config.json")
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	configuration = &Configuration{}

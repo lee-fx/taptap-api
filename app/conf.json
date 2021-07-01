@@ -1,0 +1,21 @@
+{
+  "MYSQL_NAME": "root",
+  "MYSQL_PASSWORD": "lx123321",
+  "MYSQL_HOST": "localhost",
+  "MYSQL_PORT": "3306",
+  "MYSQL_APP_DB": "taptap",
+  "MYSQL_ADMIN_DB": "taptap",
+
+  "REDIS_ADDR": "localhost",
+  "REDIS_PORT": "6379",
+  "REDIS_PASSWORD": "",
+  "REDIS_APP_DB": "0",
+  "REDIS_ADMIN_DB": "1",
+
+  "FILE_JSON_URL": "./conf.json",
+  "GAME_ICON": "./static/image/icon/",
+  "GAME_FILE_APK": "./static/pkg/apk/",
+  "MAX_UPLOAD_IMAGE_SIZE": "1024 * 1024 * 5",
+  "MAX_UPLOAD_FILE_SIZE": "1024 * 1024 * 200",
+  "FILE_SERVER_DIR_URL": "http://47.94.227.188:2333"
+}

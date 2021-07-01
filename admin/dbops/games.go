@@ -90,7 +90,7 @@ func GetGameList(page, to int, gameName string, cid int) (*defs.GameList, error)
 		var short_tag = ""
 		err = stmtGame.QueryRow(line.Id).Scan(&name, &short_tag)
 		if err != nil {
-			log.Printf("get menu scan error: %s", err)
+			log.Printf("get company scan error: %s", err)
 			return gameList, err
 		}
 		line.Company = name + "(" + short_tag + ")"
